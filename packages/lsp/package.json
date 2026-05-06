@@ -25,7 +25,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@agentscript/agentfabric-dialect": "workspace:*",
     "@agentscript/agentforce-dialect": "workspace:*",
     "@agentscript/agentscript-dialect": "workspace:*",
     "@agentscript/language": "workspace:*",

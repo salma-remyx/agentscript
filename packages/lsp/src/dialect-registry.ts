@@ -20,11 +20,9 @@
 import type { DialectConfig } from '@agentscript/language';
 import { agentforceDialect } from '@agentscript/agentforce-dialect';
 import { agentscriptDialect } from '@agentscript/agentscript-dialect';
-import { agentfabricDialect } from '@agentscript/agentfabric-dialect';
 
 /** All available dialects. First entry is the default when no annotation is present. */
 export const defaultDialects: DialectConfig[] = [
   agentforceDialect,
   agentscriptDialect,
-  agentfabricDialect,
 ];
