@@ -262,7 +262,7 @@ agent_version:
           node_type_id: commerce_shopper_agent
           node_namespace: commerceshopperagent
       input_parameters:
-        auth_token: variables.authToken
+        auth_token: state.authToken
       action_definitions:
         - developer_name: GetB2CUserAccessToken
           label: Get B2C User Access Token
@@ -329,11 +329,11 @@ agent_version:
           target: GetB2CUserAccessToken
           name: GetB2CUserAccessToken
           bound_inputs:
-            authNamedCredential: variables.authNamedCredential
-            siteId: variables.siteId
-            userId: variables.UsId
-            refreshToken: variables.RefreshToken
-            sfraAuthToken: variables.authToken
+            authNamedCredential: state.authNamedCredential
+            siteId: state.siteId
+            userId: context.UsId
+            refreshToken: context.RefreshToken
+            sfraAuthToken: state.authToken
   surfaces: []
   modality_parameters:
     language:

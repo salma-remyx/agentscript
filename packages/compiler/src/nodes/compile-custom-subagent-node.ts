@@ -16,16 +16,22 @@ import { compileReasoningActions } from './compile-reasoning-actions.js';
 import { extractStatements } from './compile-subagent-node.js';
 
 /**
- * If `decl.type` is a `@variables.X` member expression, returns `"variables.X"`.
- * Otherwise returns undefined.
+ * If `decl.type` is a `@variables.X` member expression, returns the correctly
+ * namespaced reference: `"state.X"` for mutable variables, `"context.X"` for
+ * linked variables. Matches the same logic used by compile-expression.ts for
+ * bound_inputs so the ICR runtime receives consistent reference strings.
  */
 function extractVariableRef(
-  decl: ParameterDeclarationNode
+  decl: ParameterDeclarationNode,
+  ctx: CompilerContext
 ): string | undefined {
   if (!(decl.type instanceof MemberExpression)) return undefined;
   const decomposed = decomposeAtMemberExpression(decl.type);
   if (decomposed?.namespace !== 'variables') return undefined;
-  return `variables.${decomposed.property}`;
+  const varName = decomposed.property;
+  const ns = ctx.getVariableNamespace(varName);
+  if (ns === 'context') return `context.${varName}`;
+  return `state.${varName}`;
 }
 
 /**
@@ -59,7 +65,8 @@ export function compileCustomSubagentNode(
 
   // Compile input_parameters from parameters.template
   const inputParameters = compileInputParameters(
-    block.parameters as Record<string, unknown> | undefined
+    block.parameters as Record<string, unknown> | undefined,
+    ctx
   );
 
   const actionsBlock = block.actions as
@@ -70,7 +77,7 @@ export function compileCustomSubagentNode(
   const actionDefinitions = compileActionDefinitions(actionsBlock, ctx);
 
   // Derive tools from action inputs with @variables.X bindings
-  const boundInputTools = compileTools(actionsBlock);
+  const boundInputTools = compileTools(actionsBlock, ctx);
 
   // Compile reasoning.actions into tools
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- compiler handles both topic and subagent reasoning shapes generically
@@ -150,7 +157,8 @@ export function compileCustomSubagentNode(
 // ---------------------------------------------------------------------------
 
 function compileInputParameters(
-  parametersBlock: Record<string, unknown> | undefined
+  parametersBlock: Record<string, unknown> | undefined,
+  ctx: CompilerContext
 ): Record<string, unknown> | undefined {
   if (!parametersBlock) return undefined;
 
@@ -162,7 +170,7 @@ function compileInputParameters(
   const result: Record<string, unknown> = {};
 
   for (const [key, rawDecl] of iterateNamedMap(template)) {
-    const ref = extractVariableRef(rawDecl as ParameterDeclarationNode);
+    const ref = extractVariableRef(rawDecl as ParameterDeclarationNode, ctx);
     if (ref) result[key] = ref;
   }
 
@@ -174,7 +182,8 @@ function compileInputParameters(
 // ---------------------------------------------------------------------------
 
 function compileTools(
-  actions: NamedMap<Record<string, unknown>> | undefined
+  actions: NamedMap<Record<string, unknown>> | undefined,
+  ctx: CompilerContext
 ): Array<{
   type: 'action';
   target: string;
@@ -199,7 +208,7 @@ function compileTools(
     const boundInputs: Record<string, unknown> = {};
 
     for (const [inputName, rawDecl] of iterateNamedMap(inputs)) {
-      const ref = extractVariableRef(rawDecl as ParameterDeclarationNode);
+      const ref = extractVariableRef(rawDecl as ParameterDeclarationNode, ctx);
       if (ref) boundInputs[inputName] = ref;
     }
 

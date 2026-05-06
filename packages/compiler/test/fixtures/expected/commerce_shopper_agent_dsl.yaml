@@ -157,7 +157,7 @@ agent_version:
           node_type_id: commerce_shopper_agent
           node_namespace: commerceshopperagent
       input_parameters:
-        auth_token: variables.EndUserId
+        auth_token: context.EndUserId
       action_definitions:
         - developer_name: Search_Products
           label: Search Products
@@ -205,12 +205,12 @@ agent_version:
           target: Search_Products
           name: Search_Products
           bound_inputs:
-            auth_named_credential: variables.EndUserId
+            auth_named_credential: context.EndUserId
         - type: action
           target: Add_To_Cart
           name: Add_To_Cart
           bound_inputs:
-            auth_named_credential: variables.EndUserId
+            auth_named_credential: context.EndUserId
   surfaces: []
   modality_parameters:
     language:
