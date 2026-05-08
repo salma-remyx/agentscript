@@ -14,12 +14,12 @@ import { compileActionDefinitions } from './compile-actions.js';
 import { compileDeterministicDirectives } from './compile-directives.js';
 import { compileReasoningActions } from './compile-reasoning-actions.js';
 import { extractStatements } from './compile-subagent-node.js';
+import { compileExpression } from '../expressions/compile-expression.js';
 
 /**
- * If `decl.type` is a `@variables.X` member expression, returns the correctly
- * namespaced reference: `"state.X"` for mutable variables, `"context.X"` for
- * linked variables. Matches the same logic used by compile-expression.ts for
- * bound_inputs so the ICR runtime receives consistent reference strings.
+ * If `decl.type` is a `@variables.X` member expression, compile it to its
+ * runtime reference (`state.X` or `variables.X`). Returns undefined for any
+ * other parameter shape (regular type identifiers like `string`, etc.).
  */
 function extractVariableRef(
   decl: ParameterDeclarationNode,
@@ -28,10 +28,7 @@ function extractVariableRef(
   if (!(decl.type instanceof MemberExpression)) return undefined;
   const decomposed = decomposeAtMemberExpression(decl.type);
   if (decomposed?.namespace !== 'variables') return undefined;
-  const varName = decomposed.property;
-  const ns = ctx.getVariableNamespace(varName);
-  if (ns === 'context') return `context.${varName}`;
-  return `state.${varName}`;
+  return compileExpression(decl.type, ctx);
 }
 
 /**

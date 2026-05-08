@@ -99,8 +99,8 @@ subagent Shopper_Agent:
 
     expect(node).toBeDefined();
     expect(node.input_parameters).toBeDefined();
-    expect(node.input_parameters!['auth_token']).toBe('context.EndUserId');
-    expect(node.input_parameters!['org_id']).toBe('context.EndUserId');
+    expect(node.input_parameters!['auth_token']).toBe('variables.EndUserId');
+    expect(node.input_parameters!['org_id']).toBe('variables.EndUserId');
   });
 
   it('should not set input_parameters when parameters.template is absent', () => {
@@ -182,7 +182,7 @@ subagent Shopper_Agent:
     expect(tool.target).toBe('Search_Products');
     expect(tool.name).toBe('Search_Products');
     expect(tool.bound_inputs).toEqual({
-      auth_named_credential: 'context.EndUserId',
+      auth_named_credential: 'variables.EndUserId',
     });
   });
 
@@ -214,8 +214,8 @@ subagent Shopper_Agent:
     expect(node.tools).toHaveLength(1);
     const tool = node.tools![0] as { bound_inputs: Record<string, unknown> };
     expect(tool.bound_inputs).toEqual({
-      user_id: 'context.EndUserId',
-      session_id: 'context.RoutableId',
+      user_id: 'variables.EndUserId',
+      session_id: 'variables.RoutableId',
     });
   });
 
@@ -469,7 +469,7 @@ subagent Shopper_Agent:
       node_namespace: 'commerceshopperagent',
     });
     expect(node.input_parameters).toEqual({
-      auth_token: 'context.EndUserId',
+      auth_token: 'variables.EndUserId',
     });
     expect(node.action_definitions).toHaveLength(2);
     expect(node.tools).toHaveLength(2);

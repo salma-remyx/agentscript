@@ -331,8 +331,8 @@ agent_version:
           bound_inputs:
             authNamedCredential: state.authNamedCredential
             siteId: state.siteId
-            userId: context.UsId
-            refreshToken: context.RefreshToken
+            userId: variables.UsId
+            refreshToken: variables.RefreshToken
             sfraAuthToken: state.authToken
   surfaces: []
   modality_parameters:
