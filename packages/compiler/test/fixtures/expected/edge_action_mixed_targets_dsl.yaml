@@ -76,6 +76,46 @@ agent_version:
           state_updates: []
           name: Use_Standard
           description: Use Standard
+        - type: action
+          target: Mcp_Tool_Action
+          bound_inputs: {}
+          llm_inputs:
+            - input_val
+          state_updates: []
+          name: Use_Mcp
+          description: Use Mcp
+        - type: action
+          target: Slack_Action
+          bound_inputs: {}
+          llm_inputs:
+            - input_val
+          state_updates: []
+          name: Use_Slack
+          description: Use Slack
+        - type: action
+          target: Named_Query_Action
+          bound_inputs: {}
+          llm_inputs:
+            - input_val
+          state_updates: []
+          name: Use_Named_Query
+          description: Use Named Query
+        - type: action
+          target: Retriever_Action
+          bound_inputs: {}
+          llm_inputs:
+            - input_val
+          state_updates: []
+          name: Use_Retriever
+          description: Use Retriever
+        - type: action
+          target: Quick_Action
+          bound_inputs: {}
+          llm_inputs:
+            - input_val
+          state_updates: []
+          name: Use_Quick
+          description: Use Quick
       developer_name: main
       label: Main
       action_definitions:
@@ -171,6 +211,121 @@ agent_version:
               is_list: false
               is_used_by_planner: true
               is_displayable: false
+        - developer_name: Mcp_Tool_Action
+          label: Mcp Tool Action
+          description: Action using mcpTool target
+          require_user_confirmation: false
+          include_in_progress_indicator: false
+          invocation_target_type: mcpTool
+          invocation_target_name: MyMcpTool
+          input_type:
+            - developer_name: input_val
+              label: Input Value
+              description: Input Value
+              data_type: String
+              is_list: false
+              required: true
+              is_user_input: false
+          output_type:
+            - developer_name: mcp_result
+              label: Mcp Result
+              description: Mcp Result
+              data_type: String
+              is_list: false
+              is_used_by_planner: true
+              is_displayable: false
+        - developer_name: Slack_Action
+          label: Slack Action
+          description: Action using slack target
+          require_user_confirmation: false
+          include_in_progress_indicator: false
+          invocation_target_type: slack
+          invocation_target_name: MySlackAction
+          input_type:
+            - developer_name: input_val
+              label: Input Value
+              description: Input Value
+              data_type: String
+              is_list: false
+              required: true
+              is_user_input: false
+          output_type:
+            - developer_name: slack_result
+              label: Slack Result
+              description: Slack Result
+              data_type: String
+              is_list: false
+              is_used_by_planner: true
+              is_displayable: false
+        - developer_name: Named_Query_Action
+          label: Named Query Action
+          description: Action using namedQuery target
+          require_user_confirmation: false
+          include_in_progress_indicator: false
+          invocation_target_type: namedQuery
+          invocation_target_name: MyNamedQuery
+          input_type:
+            - developer_name: input_val
+              label: Input Value
+              description: Input Value
+              data_type: String
+              is_list: false
+              required: true
+              is_user_input: false
+          output_type:
+            - developer_name: query_result
+              label: Query Result
+              description: Query Result
+              data_type: String
+              is_list: false
+              is_used_by_planner: true
+              is_displayable: false
+        - developer_name: Retriever_Action
+          label: Retriever Action
+          description: Action using retriever target
+          require_user_confirmation: false
+          include_in_progress_indicator: false
+          invocation_target_type: retriever
+          invocation_target_name: MyRetriever
+          input_type:
+            - developer_name: input_val
+              label: Input Value
+              description: Input Value
+              data_type: String
+              is_list: false
+              required: true
+              is_user_input: false
+          output_type:
+            - developer_name: retrieval_result
+              label: Retrieval Result
+              description: Retrieval Result
+              data_type: String
+              is_list: false
+              is_used_by_planner: true
+              is_displayable: false
+        - developer_name: Quick_Action
+          label: Quick Action
+          description: Action using quickAction target
+          require_user_confirmation: false
+          include_in_progress_indicator: false
+          invocation_target_type: quickAction
+          invocation_target_name: MyQuickAction
+          input_type:
+            - developer_name: input_val
+              label: Input Value
+              description: Input Value
+              data_type: String
+              is_list: false
+              required: true
+              is_user_input: false
+          output_type:
+            - developer_name: quick_result
+              label: Quick Result
+              description: Quick Result
+              data_type: String
+              is_list: false
+              is_used_by_planner: true
+              is_displayable: false
       instructions: You are a helpful assistant with access to multiple action types.
       focus_prompt: "{{state.AgentScriptInternal_agent_instructions}}"
       before_reasoning_iteration:
@@ -184,7 +339,7 @@ agent_version:
           state_updates:
             - AgentScriptInternal_agent_instructions: |-
                 template::{{state.AgentScriptInternal_agent_instructions}}
-                You have access to four different action types.
+                You have access to several different action types.
                 Use the appropriate action based on the user's request.
   surfaces: []
   modality_parameters: {}

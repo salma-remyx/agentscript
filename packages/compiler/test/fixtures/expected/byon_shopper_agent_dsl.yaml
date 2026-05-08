@@ -152,7 +152,7 @@ agent_version:
           description: Search the product catalog
           require_user_confirmation: false
           include_in_progress_indicator: true
-          invocation_target_type: byon
+          invocation_target_type: apex
           invocation_target_name: getB2cUserAccessToken
           input_type:
             - developer_name: query
@@ -169,7 +169,7 @@ agent_version:
           description: Add item to shopping cart
           require_user_confirmation: true
           include_in_progress_indicator: true
-          invocation_target_type: byon
+          invocation_target_type: apex
           invocation_target_name: add_to_cart
           input_type:
             - developer_name: product_id

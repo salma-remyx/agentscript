@@ -19,6 +19,7 @@ import type {
 } from '../types.js';
 import { resolveParameterTypeInfo } from '../variables/variable-utils.js';
 import { normalizeDeveloperName, parseUri } from '../utils.js';
+import { toAgentJsonActionTargetType } from './action-types.js';
 import {
   extractStringValue,
   extractBooleanValue,
@@ -89,8 +90,11 @@ function compileActionDefinition(
         getCstRange(def['target'])
       );
     } else {
-      // For real actions, use the scheme and path from the URI
-      if (scheme) invocationTargetType = scheme;
+      // For real actions, translate alias schemes to their canonical Agent
+      // JSON form (e.g. prompt -> generatePromptResponse). Scheme validity
+      // is enforced upstream by the agentforce dialect's
+      // actionTargetSchemeRule lint pass.
+      if (scheme) invocationTargetType = toAgentJsonActionTargetType(scheme);
       if (path) invocationTargetName = path;
     }
   }

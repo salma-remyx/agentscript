@@ -494,3 +494,70 @@ start_agent test:
     expect(placeholderWarnings).toHaveLength(2);
   });
 });
+
+describe('action target type translation', () => {
+  // Helpers
+  const makeSource = (scheme: string, name: string) => `
+config:
+    agent_name: "TestBot"
+
+start_agent test:
+    description: "Test"
+    actions:
+        my_action:
+            description: "Action"
+            target: "${scheme}://${name}"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            my_action: @actions.my_action
+`;
+
+  const compileAndGetActionDef = (scheme: string, name: string) => {
+    const { output } = compile(parseSource(makeSource(scheme, name)));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+    return (node.action_definitions ?? []).find(
+      a => a.developer_name === 'my_action'
+    );
+  };
+
+  // Alias schemes translate to their canonical Agent JSON form.
+  it.each([
+    ['prompt', 'generatePromptResponse'],
+    ['serviceCatalog', 'createCatalogItemRequest'],
+    ['integrationProcedureAction', 'executeIntegrationProcedure'],
+    ['expressionSet', 'runExpressionSet'],
+  ])(
+    'translates alias scheme "%s://" to canonical "%s"',
+    (alias, canonical) => {
+      const actionDef = compileAndGetActionDef(alias, 'X');
+      expect(actionDef?.invocation_target_type).toBe(canonical);
+      expect(actionDef?.invocation_target_name).toBe('X');
+    }
+  );
+
+  // Canonical forms are also accepted on input (and pass through unchanged).
+  it.each([
+    'generatePromptResponse',
+    'createCatalogItemRequest',
+    'executeIntegrationProcedure',
+    'runExpressionSet',
+  ])('accepts canonical scheme "%s://" unchanged', canonical => {
+    const actionDef = compileAndGetActionDef(canonical, 'X');
+    expect(actionDef?.invocation_target_type).toBe(canonical);
+  });
+
+  // Non-alias schemes pass through unchanged. (Scheme validity itself is
+  // enforced by the agentforce dialect's actionTargetSchemeRule lint pass,
+  // not by the compiler.)
+  it.each(['apex', 'mcpTool', 'slack', 'namedQuery', 'retriever'])(
+    'passes through non-alias scheme "%s://" unchanged',
+    scheme => {
+      const actionDef = compileAndGetActionDef(scheme, 'X');
+      expect(actionDef?.invocation_target_type).toBe(scheme);
+    }
+  );
+});
