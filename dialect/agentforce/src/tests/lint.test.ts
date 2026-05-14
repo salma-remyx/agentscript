@@ -1574,7 +1574,7 @@ variables:
     description: "User display name"
 
 connected_subagent support_agent:
-  target: "agentforce://Support_Agent"
+  target: "agent://Support_Agent"
   label: "Support Agent"
   description: "Handles customer support requests"
   inputs:

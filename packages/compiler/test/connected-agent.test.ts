@@ -38,7 +38,7 @@ start_agent Main:
     const source = `
 ${baseConfig}
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles order inquiries"
 `;
@@ -47,7 +47,7 @@ connected_subagent Order_Agent:
 
     expect(node).toBeDefined();
     expect(node.type).toBe('related_agent');
-    expect(node.invocation_target_type).toBe('agentforce');
+    expect(node.invocation_target_type).toBe('agent');
     expect(node.invocation_target_name).toBe('Order_Agent');
     expect(node.label).toBe('Order Agent');
     expect(node.description).toBe('Handles order inquiries');
@@ -57,7 +57,7 @@ connected_subagent Order_Agent:
     const source = `
 ${baseConfig}
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     loading_text: "Looking up your order..."
@@ -77,7 +77,7 @@ variables:
     Customer_Name: string
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -101,7 +101,7 @@ variables:
     Session_Id: linked string
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -120,7 +120,7 @@ connected_subagent Order_Agent:
     const source = `
 ${baseConfig}
 connected_subagent Simple_Agent:
-    target: "agentforce://Simple_Agent"
+    target: "agent://Simple_Agent"
     label: "Simple Agent"
     description: "A simple agent"
 `;
@@ -137,12 +137,12 @@ connected_subagent Simple_Agent:
     const source = `
 ${baseConfig}
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
 
 connected_subagent Billing_Agent:
-    target: "agentforce://Billing_Agent"
+    target: "agent://Billing_Agent"
     label: "Billing Agent"
     description: "Handles billing"
 `;
@@ -167,7 +167,7 @@ topic Support:
             | Help customers
 
 connected_subagent External_Agent:
-    target: "agentforce://External_Agent"
+    target: "agent://External_Agent"
     label: "External Agent"
     description: "External system"
 `;
@@ -194,7 +194,7 @@ connected_subagent External_Agent:
     const source = `
 ${baseConfig}
 connected_subagent My_Custom_Agent:
-    target: "agentforce://My_Custom_Agent"
+    target: "agent://My_Custom_Agent"
     description: "Custom agent"
 `;
     const { output } = compile(parseSource(source));
@@ -208,7 +208,7 @@ connected_subagent My_Custom_Agent:
     const source = `
 ${baseConfig}
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -244,7 +244,7 @@ ${baseConfig}
                 description: "Invoke support agent"
 
 connected_subagent Support_Agent:
-    target: "agentforce://Support_Agent"
+    target: "agent://Support_Agent"
     label: "Support Agent"
     description: "Handles support"
 `;
@@ -269,7 +269,7 @@ ${baseConfig}
                 description: "Invoke billing agent"
 
 connected_subagent Billing_Agent:
-    target: "agentforce://Billing_Agent"
+    target: "agent://Billing_Agent"
     label: "Billing Agent"
     description: "Handles billing"
 `;
@@ -305,7 +305,7 @@ ${baseConfig}
                 description: "Invoke order agent"
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
 `;
@@ -334,7 +334,7 @@ ${baseConfig}
                 description: "Transfer to support"
 
 connected_subagent Support_Agent:
-    target: "agentforce://Support_Agent"
+    target: "agent://Support_Agent"
     label: "Support Agent"
     description: "Handles support"
 `;
@@ -356,7 +356,7 @@ ${baseConfig}
             | Help the user.
 
 connected_subagent Support_Agent:
-    target: "agentforce://Support_Agent"
+    target: "agent://Support_Agent"
     label: "Support Agent"
     description: "Handles support"
 `;
@@ -380,7 +380,7 @@ ${baseConfig}
                 with typo_input = "foo"
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -403,7 +403,7 @@ ${baseConfig}
                 description: "Invoke order agent"
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -431,7 +431,7 @@ variables:
     Default_Id: string
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -455,7 +455,7 @@ ${baseConfig}
                 with customer_id = "abc"
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -496,7 +496,7 @@ variables:
     Cid: string
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:
@@ -535,7 +535,7 @@ topic Billing:
             | Handle billing
 
 connected_subagent Support_Agent:
-    target: "agentforce://Support_Agent"
+    target: "agent://Support_Agent"
     label: "Support Agent"
     description: "Handles support"
 `;
@@ -623,7 +623,7 @@ start_agent Main:
                 set @variables.Last_Agent = "Support_Agent"
 
 connected_subagent Support_Agent:
-    target: "agentforce://Support_Agent"
+    target: "agent://Support_Agent"
     label: "Support Agent"
     description: "Handles support"
 `;
@@ -658,7 +658,7 @@ start_agent Main:
             | Handle requests
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
 `;
@@ -682,7 +682,7 @@ start_agent Main:
                 with order_id = "123"
 
 connected_subagent Order_Agent:
-    target: "agentforce://Order_Agent"
+    target: "agent://Order_Agent"
     label: "Order Agent"
     description: "Handles orders"
     inputs:

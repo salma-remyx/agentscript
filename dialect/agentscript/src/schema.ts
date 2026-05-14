@@ -300,7 +300,7 @@ export const ConnectedSubagentBlock = NamedBlock(
   {
     target: StringValue.accepts(['StringLiteral'])
       .describe(
-        'URI identifying the connected agent (e.g., "agentforce://Agent_Name").'
+        'URI identifying the connected agent (e.g., "agent://Agent_Name").'
       )
       .required()
       .pattern(/^[a-zA-Z][a-zA-Z0-9_]*:\/\/\S+$/),

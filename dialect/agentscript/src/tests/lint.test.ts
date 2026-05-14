@@ -2174,7 +2174,7 @@ start_agent main:
     actions:
       call_support: @connected_subagent.Support_Agent
 connected_subagent Support_Agent:
-  target: "agentforce://Support_Agent"
+  target: "agent://Support_Agent"
   label: "Support"
   description: "Support agent"
 `);
@@ -2895,7 +2895,7 @@ start_agent main:
         with nonexistent_param=@variables.val
 
 connected_subagent Order_Agent:
-  target: "agentforce://Order_Agent"
+  target: "agent://Order_Agent"
   label: "Order Agent"
   description: "Handles orders"
   inputs:
@@ -2920,7 +2920,7 @@ start_agent main:
         description: "Call the agent"
 
 connected_subagent Order_Agent:
-  target: "agentforce://Order_Agent"
+  target: "agent://Order_Agent"
   label: "Order Agent"
   description: "Handles orders"
   inputs:
@@ -2948,7 +2948,7 @@ start_agent main:
         description: "Call the agent"
 
 connected_subagent Order_Agent:
-  target: "agentforce://Order_Agent"
+  target: "agent://Order_Agent"
   label: "Order Agent"
   description: "Handles orders"
   inputs:
@@ -2974,7 +2974,7 @@ start_agent main:
         with order_id=@variables.order_id
 
 connected_subagent Order_Agent:
-  target: "agentforce://Order_Agent"
+  target: "agent://Order_Agent"
   label: "Order Agent"
   description: "Handles orders"
   inputs:
@@ -3000,7 +3000,7 @@ start_agent main:
         with order_id=...
 
 connected_subagent Order_Agent:
-  target: "agentforce://Order_Agent"
+  target: "agent://Order_Agent"
   label: "Order Agent"
   description: "Handles orders"
   inputs:
@@ -3026,7 +3026,7 @@ start_agent main:
         description: "Call simple agent"
 
 connected_subagent Simple_Agent:
-  target: "agentforce://Simple_Agent"
+  target: "agent://Simple_Agent"
   label: "Simple"
   description: "No inputs"
 `);

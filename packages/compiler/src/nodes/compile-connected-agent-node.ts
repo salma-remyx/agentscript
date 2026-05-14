@@ -34,7 +34,7 @@ export function compileConnectedAgentNode(
 
   const boundInputs = compileBoundInputs(block.inputs, ctx);
 
-  // Parse target URI (e.g. "agentforce://Sales_Agent") to derive invocation type/name
+  // Parse target URI (e.g. "agent://Sales_Agent") to derive invocation type/name
   const targetUri = extractStringValue(block.target);
   let invocationTargetType = 'externalService';
   let invocationTargetName = name;
