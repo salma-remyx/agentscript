@@ -356,6 +356,9 @@ unifiedAgentSpec:
             enabled: parse_json(system.node_outputs['analyze_request']).category ==
               "technical"
           - type: handoff
+            target: analyze_request
+            enabled: state.request.headers[lower("Slack-UUID")] != ""
+          - type: handoff
             target: general_response
         add-tool-result-to-chat-history: false
         output-template: null
