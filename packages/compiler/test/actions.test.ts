@@ -315,6 +315,237 @@ start_agent test:
   });
 });
 
+describe('setVariables with condition', () => {
+  it('should compile @utils.setVariables with available when and `with` LLM-filled inputs', () => {
+    const source = `
+config:
+    agent_name: "TestBot"
+
+variables:
+    should_run: linked boolean
+        description: "Should Run"
+    user_name: mutable string
+        description: "User name"
+    user_email: mutable string
+        description: "User email"
+
+start_agent test:
+    description: "Test"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            capture_user_info: @utils.setVariables
+                description: "Capture user info"
+                available when @variables.should_run
+                with user_name=...
+                with user_email=...
+`;
+    const { output } = compile(parseSource(source));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+
+    const setVarTool = node.tools.find(t => t.name === 'capture_user_info')!;
+    expect(setVarTool).toBeDefined();
+    expect(setVarTool.target).toBe(STATE_UPDATE_ACTION);
+    expect(setVarTool.enabled).toBe('variables.should_run');
+    expect(setVarTool.llm_inputs).toEqual(['user_name', 'user_email']);
+    expect(setVarTool.state_updates).toEqual([
+      { user_name: 'result.user_name' },
+      { user_email: 'result.user_email' },
+    ]);
+    expect(setVarTool.bound_inputs).toEqual({});
+    expect(setVarTool.input_parameters).toEqual([
+      { developer_name: 'user_name', label: 'user_name', data_type: 'String' },
+      {
+        developer_name: 'user_email',
+        label: 'user_email',
+        data_type: 'String',
+      },
+    ]);
+  });
+
+  it('should compile @utils.setVariables with available when and `set @variables` clauses', () => {
+    const source = `
+config:
+    agent_name: "TestBot"
+
+variables:
+    allow_update: linked boolean
+        description: "Allow update"
+    status: mutable string = ""
+    counter: mutable number = 0
+
+start_agent test:
+    description: "Test"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            update_state: @utils.setVariables
+                description: "Update state"
+                available when @variables.allow_update
+                set @variables.status = "done"
+                set @variables.counter = 1
+`;
+    const { output } = compile(parseSource(source));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+
+    const setVarTool = node.tools.find(t => t.name === 'update_state')!;
+    expect(setVarTool).toBeDefined();
+    expect(setVarTool.target).toBe(STATE_UPDATE_ACTION);
+    expect(setVarTool.enabled).toBe('variables.allow_update');
+    expect(setVarTool.state_updates).toEqual([
+      { status: '"done"' },
+      { counter: '1' },
+    ]);
+    // No `with` clauses → no llm_inputs / bound_inputs / input_parameters
+    expect(setVarTool.llm_inputs).toBeUndefined();
+    expect(setVarTool.bound_inputs).toBeUndefined();
+    expect(setVarTool.input_parameters).toBeUndefined();
+  });
+
+  it('should compile @utils.setVariables with available when referencing a mutable state variable', () => {
+    const source = `
+config:
+    agent_name: "TestBot"
+
+variables:
+    is_ready: mutable boolean = False
+    user_name: mutable string
+
+start_agent test:
+    description: "Test"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            capture_when_ready: @utils.setVariables
+                description: "Capture name when ready"
+                available when @variables.is_ready
+                with user_name=...
+`;
+    const { output } = compile(parseSource(source));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+
+    const setVarTool = node.tools.find(t => t.name === 'capture_when_ready')!;
+    expect(setVarTool).toBeDefined();
+    expect(setVarTool.target).toBe(STATE_UPDATE_ACTION);
+    // Mutable variables resolve to the `state.` namespace, not `variables.`
+    expect(setVarTool.enabled).toBe('state.is_ready');
+    expect(setVarTool.llm_inputs).toEqual(['user_name']);
+  });
+
+  it('should compile complex available when expression on @utils.setVariables', () => {
+    const source = `
+config:
+    agent_name: "TestBot"
+
+variables:
+    is_business_hours: linked boolean
+        description: "Business hours"
+    region: mutable string = ""
+
+start_agent test:
+    description: "Test"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            capture_region: @utils.setVariables
+                description: "Capture region"
+                available when @variables.is_business_hours == True
+                with region=...
+`;
+    const { output } = compile(parseSource(source));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+
+    const setVarTool = node.tools.find(t => t.name === 'capture_region')!;
+    expect(setVarTool).toBeDefined();
+    expect(setVarTool.enabled).toBe('variables.is_business_hours == True');
+    expect(setVarTool.llm_inputs).toEqual(['region']);
+  });
+
+  it('should compile @utils.setVariables without available when (no enabled condition)', () => {
+    const source = `
+config:
+    agent_name: "TestBot"
+
+variables:
+    user_name: mutable string
+
+start_agent test:
+    description: "Test"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            capture_name: @utils.setVariables
+                description: "Capture name"
+                with user_name=...
+`;
+    const { output } = compile(parseSource(source));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+
+    const setVarTool = node.tools.find(t => t.name === 'capture_name')!;
+    expect(setVarTool).toBeDefined();
+    expect(setVarTool.enabled).toBeUndefined();
+  });
+
+  it('should keep the last available when and warn when multiple are specified', () => {
+    const source = `
+config:
+    agent_name: "TestBot"
+
+variables:
+    first_flag: linked boolean
+        description: "First"
+    second_flag: linked boolean
+        description: "Second"
+    user_name: mutable string
+
+start_agent test:
+    description: "Test"
+    reasoning:
+        instructions: ->
+            | test
+        actions:
+            capture: @utils.setVariables
+                description: "Capture"
+                available when @variables.first_flag
+                available when @variables.second_flag
+                with user_name=...
+`;
+    const { output, diagnostics } = compile(parseSource(source));
+    const node = output.agent_version.nodes.find(
+      n => n.developer_name === 'test'
+    )!;
+
+    const setVarTool = node.tools.find(t => t.name === 'capture')!;
+    expect(setVarTool).toBeDefined();
+    expect(setVarTool.enabled).toBe('variables.second_flag');
+
+    const duplicateAvailableWhenWarnings = diagnostics.filter(
+      d =>
+        d.severity === DiagnosticSeverity.Warning &&
+        d.message.includes('Multiple "available when" clauses')
+    );
+    expect(duplicateAvailableWhenWarnings).toHaveLength(1);
+    expect(duplicateAvailableWhenWarnings[0].message).toContain(
+      'only the last one is applied'
+    );
+  });
+});
+
 describe('mixed actions and transitions', () => {
   // Python: test_action_aliases.test_mixed_actions_and_transitions
   it('should compile actions alongside transitions', () => {

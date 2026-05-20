@@ -542,6 +542,9 @@ agent_version:
           name: decline_pending_flow
           description: Clear the pending flow when the prospect declines to proceed, or
             wants to do something else instead such as asking about products.
+          enabled: state.ActiveFlow == "pending_verification" or state.ActiveFlow ==
+            "pending_qualification" or state.ActiveFlow ==
+            "pending_record_creation"
           bound_inputs: {}
           llm_inputs: []
           input_parameters: []

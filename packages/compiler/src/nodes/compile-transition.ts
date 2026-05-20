@@ -75,6 +75,13 @@ export function compileTransition(
         lastAvailableWhenRange = undefined;
       }
     } else if (stmt instanceof AvailableWhen) {
+      // encountering the `available when` cluase again will throw a warning for now
+      if (availableWhenCondition !== undefined) {
+        ctx.warning(
+          'Multiple "available when" clauses on @utils.transition; only the last one is applied.',
+          stmt.__cst?.range
+        );
+      }
       availableWhenCondition = compileExpression(stmt.condition, ctx);
       lastAvailableWhenRange = stmt.__cst?.range;
     } else if (stmt instanceof TransitionStatement) {
