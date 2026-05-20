@@ -338,12 +338,16 @@ connected_subagent Support_Agent:
     label: "Support Agent"
     description: "Handles support"
 `;
-    const { diagnostics } = compile(parseSource(source));
+    const { output, diagnostics } = compile(parseSource(source));
     const transitionWarnings = diagnostics.filter(d =>
       d.message.includes('Transition to connected agent')
     );
     expect(transitionWarnings.length).toBeGreaterThan(0);
     expect(transitionWarnings[0].severity).toBe(DiagnosticSeverity.Warning);
+
+    // Warning should not block compilation — transition tool should still be present
+    const node = findNode(output, 'Main');
+    expect(node?.tools.some(t => t.name === 'transfer')).toBe(true);
   });
 
   it('should warn when transitioning to @connected_subagent.X in after_reasoning', () => {

@@ -57,7 +57,7 @@ export function compileTransition(
 
   for (const stmt of body) {
     if (stmt instanceof ToClause) {
-      if (warnIfConnectedAgentTransition(stmt.target, ctx)) continue;
+      warnIfConnectedAgentTransition(stmt.target, ctx);
       const targetName = resolveAtReference(
         stmt.target,
         TRANSITION_TARGET_NAMESPACES,
@@ -80,7 +80,7 @@ export function compileTransition(
     } else if (stmt instanceof TransitionStatement) {
       for (const clause of stmt.clauses) {
         if (clause instanceof ToClause) {
-          if (warnIfConnectedAgentTransition(clause.target, ctx)) continue;
+          warnIfConnectedAgentTransition(clause.target, ctx);
           const targetName = resolveAtReference(
             clause.target,
             TRANSITION_TARGET_NAMESPACES,
@@ -107,16 +107,15 @@ export function compileTransition(
     // The colinear value might encode a target (not typical for AgentForce)
     const colinear = actionDef.value;
     if (colinear) {
-      if (!warnIfConnectedAgentTransition(colinear as Expression, ctx)) {
-        const targetName = resolveAtReference(
-          colinear as Expression,
-          TRANSITION_TARGET_NAMESPACES,
-          ctx,
-          'transition target'
-        );
-        if (targetName) {
-          transitions.push({ targetName, condition: undefined });
-        }
+      warnIfConnectedAgentTransition(colinear as Expression, ctx);
+      const targetName = resolveAtReference(
+        colinear as Expression,
+        TRANSITION_TARGET_NAMESPACES,
+        ctx,
+        'transition target'
+      );
+      if (targetName) {
+        transitions.push({ targetName, condition: undefined });
       }
     }
   }

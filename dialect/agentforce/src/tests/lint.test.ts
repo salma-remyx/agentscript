@@ -1755,13 +1755,13 @@ connected_subagent Support_Agent:
   description: "Handles support"
 `);
 
-    const errors = diagnostics.filter(
+    const warnings = diagnostics.filter(
       d => d.code === 'connected-agent-no-transition'
     );
-    expect(errors).toHaveLength(1);
-    expect(errors[0].severity).toBe(DiagnosticSeverity.Error);
-    expect(errors[0].message).toContain('not yet supported');
-    expect(errors[0].message).toContain('@connected_subagent.Support_Agent');
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].severity).toBe(DiagnosticSeverity.Warning);
+    expect(warnings[0].message).toContain('not yet supported');
+    expect(warnings[0].message).toContain('@connected_subagent.Support_Agent');
   });
 
   it('does not flag @connected_subagent.X as a tool invocation', () => {
