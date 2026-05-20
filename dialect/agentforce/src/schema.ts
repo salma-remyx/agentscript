@@ -47,12 +47,17 @@ import {
   AgentScriptSchemaAliases,
   AgentScriptSchemaInfo,
   defaultSubagentFields,
+  customSubagentFields,
 } from '@agentscript/agentscript-dialect';
 
 import {
   COMMERCE_SHOPPER_SCHEMA,
   commerceShopperVariantFields,
 } from './variants/commerce-cloud-shopper.js';
+import {
+  BYON_SCHEMA_PREFIX,
+  byonSubagentVariantFields,
+} from './variants/byon.js';
 
 const AFVariablesBlock = VariablesBlock.extendProperties({
   source: ReferenceValue.describe(
@@ -319,16 +324,46 @@ export const AFTopicBlock = NamedBlock(
 // ---------------------------------------------------------------------------
 
 /**
- * Pre-merge variant fields for commerce shopper subagents.
- * Exported so the lint pass can check allowed fields before NamedBlock merges with the base.
+ * Cross-cutting fields available to ALL custom subagent (BYON) variants.
+ * Adds the AF-specific blocks (`actions`, `model_config`, `security`) on top
+ * of base agentscript `customSubagentFields` (`label`, `description`,
+ * `system`, `actions`, `reasoning`, `schema` discriminator, `parameters`,
+ * `on_init`, `on_exit`). Variants may override `parameters` or `reasoning`.
  */
-export const commerceShopperVariant = {
-  ...commerceShopperVariantFields,
+const afCustomSubagentFields = {
+  ...customSubagentFields,
   actions: AFActionsBlock,
   model_config: ModelConfigBlock.describe(
     'Model configuration for this block.'
   ),
   security: SecurityBlock,
+};
+
+/**
+ * Pre-merge variant fields for commerce shopper subagents.
+ * Exported so the lint pass can check allowed fields before NamedBlock merges with the base.
+ *
+ * `reasoning.instructions` is blacklisted: commerce shopper runs deterministic
+ * server-side flows and the LLM-instructions surface isn't applicable. Authors
+ * may still bind tools via `reasoning.actions`.
+ */
+export const commerceShopperVariant = {
+  ...afCustomSubagentFields,
+  ...commerceShopperVariantFields,
+  reasoning: ReasoningBlock.omit('instructions').describe(
+    'Reasoning block containing actions available to the agent. ' +
+      'Note: `instructions` is not supported on the commerce shopper variant.'
+  ),
+};
+
+/**
+ * Pre-merge variant fields for generic BYON subagents.
+ * Inherits the full `reasoning` block (instructions + actions) from
+ * afCustomSubagentFields — no overrides beyond the variant's parameters shape.
+ */
+const byonSubagentVariant = {
+  ...afCustomSubagentFields,
+  ...byonSubagentVariantFields,
 };
 
 export const AFSubagentBlock = NamedBlock(
@@ -341,7 +376,12 @@ export const AFSubagentBlock = NamedBlock(
 )
   .describe('A subagent defining agent logic with actions and reasoning.')
   .discriminant('schema')
-  .variant(COMMERCE_SHOPPER_SCHEMA, commerceShopperVariant);
+  .variant(COMMERCE_SHOPPER_SCHEMA, commerceShopperVariant)
+  .variantMatch(
+    'byon',
+    (value: string) => value.startsWith(BYON_SCHEMA_PREFIX),
+    byonSubagentVariant
+  );
 
 // ---------------------------------------------------------------------------
 // StartAgent block
@@ -360,7 +400,12 @@ export const AFStartAgentBlock = StartAgentBlock.extend(
   { scopeAlias: 'topic' }
 )
   .discriminant('schema')
-  .variant(COMMERCE_SHOPPER_SCHEMA, commerceShopperVariant);
+  .variant(COMMERCE_SHOPPER_SCHEMA, commerceShopperVariant)
+  .variantMatch(
+    'byon',
+    (value: string) => value.startsWith(BYON_SCHEMA_PREFIX),
+    byonSubagentVariant
+  );
 
 export const KnowledgeBlock = Block('KnowledgeBlock', {
   citations_url: StringValue.describe('URL prefix for citation links.'),

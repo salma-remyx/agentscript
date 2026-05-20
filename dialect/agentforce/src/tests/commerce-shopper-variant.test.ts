@@ -242,4 +242,51 @@ start_agent Commerce_Shopper:
     );
     expect(errors.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('does not validate fields on a generic node://byon/* subagent', () => {
+    // before_reasoning would error on a commerce variant; on a generic BYON
+    // node we expect no custom-subagent-validation diagnostics.
+    const diagnostics = runLint(`
+subagent Custom_Node:
+    schema: "node://byon/myteam/widget/v1"
+    description: "Generic BYON node"
+    before_reasoning:
+        set @variables.x = 1
+    reasoning:
+        instructions: ->
+            | Anything goes
+`);
+    const errors = diagnostics.filter(
+      d => d.code === 'custom-subagent-validation'
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it('warns that node://byon/* is for test/lower envs only, not prod', () => {
+    const diagnostics = runLint(`
+subagent Custom_Node:
+    schema: "node://byon/myteam/widget/v1"
+    description: "Generic BYON node"
+`);
+    const warnings = diagnostics.filter(
+      d => d.code === 'byon-not-for-production'
+    );
+    // runLint merges AST-attached diagnostics with engine output, so a single
+    // diagnostic can appear twice — match the existing pattern in this file.
+    expect(warnings.length).toBeGreaterThanOrEqual(1);
+    expect(warnings[0].severity).toBe(2); // Warning
+    expect(warnings[0].message).toMatch(/test and lower environments/i);
+  });
+
+  it('does not warn byon-not-for-production for the commerce schema', () => {
+    const diagnostics = runLint(`
+subagent Commerce_Shopper:
+    schema: "node://commerce/shopper_agent/v1"
+    description: "Commerce Cloud shopper agent"
+`);
+    const warnings = diagnostics.filter(
+      d => d.code === 'byon-not-for-production'
+    );
+    expect(warnings).toHaveLength(0);
+  });
 });

@@ -43,6 +43,36 @@ export const COMMERCE_SHOPPER_BYO_CLIENT: BYOClientConfig = {
   },
 };
 
+const NODE_URI_SCHEME = 'node://';
+const BYON_PATH_PREFIX = 'byon/';
+
+/**
+ * Derive a BYOClientConfig from a generic BYON schema URI of the shape
+ * `node://byon/<namespace>/<type>/<version>`. Returns undefined if the URI
+ * doesn't match that exact 3-segment shape under `node://byon/`.
+ *
+ * The version segment is required (so it can be wired into byo_client.configuration
+ * later without a breaking change) but is currently discarded.
+ */
+export function deriveByonClient(
+  schemaUri: string
+): BYOClientConfig | undefined {
+  if (!schemaUri.startsWith(NODE_URI_SCHEME)) return undefined;
+  const path = schemaUri.slice(NODE_URI_SCHEME.length);
+  if (!path.startsWith(BYON_PATH_PREFIX)) return undefined;
+  const segments = path.slice(BYON_PATH_PREFIX.length).split('/');
+  if (segments.length !== 3) return undefined;
+  const [namespace, typeId] = segments;
+  if (!namespace || !typeId || !segments[2]) return undefined;
+  return {
+    client_ref: 'icr-default',
+    configuration: {
+      node_type_id: typeId,
+      node_namespace: namespace,
+    },
+  };
+}
+
 /**
  * Compile a custom subagent block into a BYONNode.
  *
@@ -159,16 +189,18 @@ function compileInputParameters(
 ): Record<string, unknown> | undefined {
   if (!parametersBlock) return undefined;
 
-  const template = parametersBlock['template'] as
-    | NamedMap<ParameterDeclarationNode>
-    | undefined;
-  if (!template || template.size === 0) return undefined;
-
   const result: Record<string, unknown> = {};
 
-  for (const [key, rawDecl] of iterateNamedMap(template)) {
-    const ref = extractVariableRef(rawDecl as ParameterDeclarationNode, ctx);
-    if (ref) result[key] = ref;
+  for (const key of Object.keys(parametersBlock)) {
+    if (key.startsWith('__')) continue;
+    const group = parametersBlock[key];
+    if (!(group instanceof NamedMap)) continue;
+    for (const [paramKey, rawDecl] of iterateNamedMap(
+      group as NamedMap<ParameterDeclarationNode>
+    )) {
+      const ref = extractVariableRef(rawDecl as ParameterDeclarationNode, ctx);
+      if (ref) result[paramKey] = ref;
+    }
   }
 
   return Object.keys(result).length > 0 ? result : undefined;

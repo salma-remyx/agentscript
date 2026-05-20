@@ -33,6 +33,7 @@ export {
 } from './schema.js';
 
 export { COMMERCE_SHOPPER_SCHEMA } from './variants/commerce-cloud-shopper.js';
+export { BYON_SCHEMA_PREFIX } from './variants/byon.js';
 
 export type {
   AgentforceSchema as AgentforceSchemaType,

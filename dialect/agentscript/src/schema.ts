@@ -204,6 +204,9 @@ export const baseSubagentFields = {
   ).required(),
   system: SystemBlock.pick(['instructions']),
   actions: ActionsBlock.describe('Action definitions available to this block.'),
+  reasoning: ReasoningBlock.describe(
+    'Reasoning block containing instructions and actions for the agent reasoning loop.'
+  ),
   schema: StringValue.describe(
     'URI identifying the subagent schema variant (e.g., "node://CustomSubagent"). When specified, enables custom field validation.'
   )
@@ -212,7 +215,7 @@ export const baseSubagentFields = {
 };
 
 /**
- * Default subagent fields including reasoning capabilities.
+ * Default subagent fields adding the pre/post reasoning hooks.
  * Used by SubagentBlock and StartAgentBlock for standard agent behavior.
  */
 export const defaultSubagentFields = {
@@ -231,30 +234,20 @@ export const defaultSubagentFields = {
     .disallowTemplates(
       'Templates are for LLM instructions and should only be used in reasoning.instructions.'
     ),
-  reasoning: ReasoningBlock.describe(
-    'Reasoning block containing instructions and actions for the agent reasoning loop.'
-  ),
 };
 
 /**
- * Reasoning block for custom subagent (BYON) variants.
- * Only includes actions — no instructions, since BYON nodes execute
- * custom reasoning logic on remote compute rather than using the LLM loop.
- */
-const BYONReasoningBlock = ReasoningBlock.pick(['actions']);
-
-/**
  * Custom subagent fields for schema variants.
- * Includes parameters block for custom configuration.
- * Used when registering custom schema variants with .variant().
+ * Adds the BYON-only fields (parameters, on_init, on_exit) on top of
+ * baseSubagentFields. Each variant supplies its own `reasoning` (e.g.
+ * `BYONReasoningBlock` for actions-only).
+ *
+ * Used when registering custom schema variants with .variant() / .variantMatch().
  */
 export const customSubagentFields = {
   ...baseSubagentFields,
   parameters: Block('ParametersBlock', {}).describe(
     'Custom parameters for schema variants. Structure is defined by the schema variant.'
-  ),
-  reasoning: BYONReasoningBlock.describe(
-    'Reasoning block containing actions available to the agent (instructions not supported for custom subagents).'
   ),
   on_init: ProcedureValue.describe(
     'Procedures that run when the subagent is initialized.'
