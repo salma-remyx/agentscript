@@ -22,6 +22,7 @@ export {
   AFActionsBlock,
   ModelConfigBlock,
   ContextBlock,
+  RecommendedPromptsBlock,
   AgentforceSchema,
   AgentforceKindToSchemaKey,
   AgentforceSchemaAliases,
@@ -69,6 +70,7 @@ import type {
   EndpointingConfigBlock,
   BeepBoopConfigBlock,
   ContextBlock,
+  RecommendedPromptsBlock,
 } from './schema.js';
 
 export type ParsedConfig = InferFieldType<typeof AgentforceSchema.config>;
@@ -89,6 +91,9 @@ export type ParsedEndpointingConfig = InferFieldType<
 >;
 export type ParsedBeepBoopConfig = InferFieldType<typeof BeepBoopConfigBlock>;
 export type ParsedContext = InferFieldType<typeof ContextBlock>;
+export type ParsedRecommendedPrompts = InferFieldType<
+  typeof RecommendedPromptsBlock
+>;
 
 export { defaultRules } from './lint/passes/index.js';
 

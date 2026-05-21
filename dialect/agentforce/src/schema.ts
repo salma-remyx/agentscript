@@ -43,6 +43,7 @@ import {
   ConfigBlock,
   ConnectedSubagentBlock,
   StartAgentBlock,
+  SystemBlock,
   AgentScriptSchema,
   AgentScriptSchemaAliases,
   AgentScriptSchemaInfo,
@@ -137,6 +138,26 @@ const ContextMemoryBlock = Block('ContextMemoryBlock', {
 export const ContextBlock = Block('ContextBlock', {
   memory: ContextMemoryBlock.describe('Memory configuration.'),
 }).describe('Context configuration for the agent.');
+
+export const RecommendedPromptsBlock = Block('RecommendedPromptsBlock', {
+  in_conversation: BooleanValue.describe(
+    'Whether in-conversation recommendations are enabled for the agent.'
+  ),
+  welcome_screen: BooleanValue.describe(
+    'Whether welcome screen recommendations are enabled for the agent.'
+  ),
+  starter_prompts: ExpressionSequence().describe(
+    'Up to 20 starter prompt strings, each between 1 and 50 characters. Only allowed when welcome_screen is True. Min 3 entries.'
+  ),
+}).describe(
+  'Recommended prompts configuration. Only supported for AgentforceEmployeeAgent.'
+);
+
+const AFSystemBlock = SystemBlock.extend({
+  recommended_prompts: RecommendedPromptsBlock.describe(
+    'Recommended prompts configuration for welcome and in-conversation suggestions.'
+  ),
+});
 
 const AFConfigBlock = ConfigBlock.extend(
   {
@@ -758,6 +779,7 @@ const ModalitiesBlock = NamedCollectionBlock(ModalityBlock);
 
 export const AgentforceSchema = {
   ...AgentScriptSchema,
+  system: AFSystemBlock,
   config: AFConfigBlock,
   variables: AFVariablesBlock,
   model_config: ModelConfigBlock.describe(
