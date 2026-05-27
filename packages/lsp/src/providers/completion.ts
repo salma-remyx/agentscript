@@ -156,21 +156,24 @@ export function provideCompletion(
         const afterColon = textBeforeCursor.substring(colonIdx + 1).trim();
         const valueStart = character - afterColon.length;
 
-        items = valueCandidates.map((candidate, idx) => ({
-          label: candidate.name,
-          kind: toCompletionItemKind(candidate.kind),
-          detail: candidate.detail,
-          documentation: candidate.documentation,
-          insertText: candidate.name,
-          textEdit: {
-            range: {
-              start: { line, character: valueStart },
-              end: { line, character },
+        items = valueCandidates.map((candidate, idx) => {
+          const insertText = candidate.insertText ?? candidate.name;
+          return {
+            label: candidate.name,
+            kind: toCompletionItemKind(candidate.kind),
+            detail: candidate.detail,
+            documentation: candidate.documentation,
+            insertText,
+            textEdit: {
+              range: {
+                start: { line, character: valueStart },
+                end: { line, character },
+              },
+              newText: insertText,
             },
-            newText: candidate.name,
-          },
-          sortText: String(idx).padStart(4, '0'),
-        }));
+            sortText: String(idx).padStart(4, '0'),
+          };
+        });
       }
     } else {
       // ── `with` parameter name completions ──────────────────────────
