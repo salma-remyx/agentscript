@@ -2200,6 +2200,75 @@ start_agent main:
     );
     expect(errors).toHaveLength(0);
   });
+
+  it('rejects bare identifier as invocation target', () => {
+    const diagnostics = runLint(`
+start_agent main:
+  description: "test"
+  reasoning:
+    instructions: ->
+      |do it
+    actions:
+      hello: world
+`);
+    const errors = diagnostics.filter(
+      d => d.code === 'constraint-resolved-type'
+    );
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toContain('@namespace.member');
+    expect(errors[0].message).toContain('invocation target');
+  });
+
+  it('rejects string literal as invocation target', () => {
+    const diagnostics = runLint(`
+start_agent main:
+  description: "test"
+  reasoning:
+    instructions: ->
+      |do it
+    actions:
+      hello: "world"
+`);
+    const errors = diagnostics.filter(
+      d => d.code === 'constraint-resolved-type'
+    );
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toContain('@namespace.member');
+  });
+
+  it('rejects ellipsis as invocation target', () => {
+    const diagnostics = runLint(`
+start_agent main:
+  description: "test"
+  reasoning:
+    instructions: ->
+      |do it
+    actions:
+      hello: ...
+`);
+    const errors = diagnostics.filter(
+      d => d.code === 'constraint-resolved-type'
+    );
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toContain('@namespace.member');
+  });
+
+  it('rejects lone @utils as invocation target', () => {
+    const diagnostics = runLint(`
+start_agent main:
+  description: "test"
+  reasoning:
+    instructions: ->
+      |do it
+    actions:
+      hello: @utils
+`);
+    const errors = diagnostics.filter(
+      d => d.code === 'constraint-resolved-type'
+    );
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toContain('@namespace.member');
+  });
 });
 
 // ============================================================================

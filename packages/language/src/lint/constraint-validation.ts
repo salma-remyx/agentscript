@@ -155,6 +155,27 @@ function validateConstraints(
     }
   }
 
+  // resolvedType also rejects non-MemberExpression colinear values (bare
+  // identifiers, string literals, ellipsis, lone @ns). These compile to a
+  // no-op tool at runtime because compile-tool.ts only rebinds target for
+  // @actions.X / @connected_subagent.X member expressions. Every legitimate
+  // invocation/transition target is qualified as @namespace.member.
+  if (constraints.resolvedType && !(node instanceof MemberExpression)) {
+    validatedRefs?.add(node);
+    const label = resolvedTypeLabel(constraints.resolvedType);
+    const kind = (node as { __kind?: string }).__kind ?? 'unknown';
+    attachDiagnostic(
+      node,
+      lintDiagnostic(
+        range,
+        `'${fieldName}' must be an @namespace.member ${label} (e.g. @actions.X). Got ${kind}.`,
+        DiagnosticSeverity.Error,
+        'constraint-resolved-type'
+      )
+    );
+    return;
+  }
+
   // Validate allowedNamespaces for ReferenceValue (MemberExpression) fields.
   // Early return is safe: MemberExpression nodes won't match extractStaticValue()
   // (which only handles NumberValue/BooleanValue/StringLiteral), so no downstream
