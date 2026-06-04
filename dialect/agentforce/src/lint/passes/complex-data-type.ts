@@ -143,7 +143,6 @@ class ComplexDataTypePass implements LintPass {
       const hasSchema =
         hasComplexDataTypeField ||
         (kind === 'input' && hasStringField(props, 'schema'));
-      console.log('Schema: ', hasSchema);
       if (!hasSchema) {
         const required =
           kind === 'input'
