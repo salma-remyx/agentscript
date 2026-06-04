@@ -310,6 +310,14 @@ export const ConnectedSubagentBlock = NamedBlock(
       'Message to display while the connected agent is executing.'
     ),
     inputs: InputsBlock,
+    after_response: ProcedureValue.describe(
+      'Procedures that run after the connected agent returns a response. ' +
+        'Supports run/set/if/transition for post-response state updates and handoffs.'
+    )
+      .omitArrow()
+      .disallowTemplates(
+        'Templates are for LLM instructions; connected agents have no reasoning loop.'
+      ),
   },
   { capabilities: ['invocationTarget', 'transitionTarget'] }
 );

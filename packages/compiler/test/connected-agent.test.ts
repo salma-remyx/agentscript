@@ -16,6 +16,12 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/compile.js';
 import { DiagnosticSeverity } from '../src/diagnostics.js';
 import { parseSource } from './test-utils.js';
+import {
+  NEXT_TOPIC_VARIABLE,
+  EMPTY_TOPIC_VALUE,
+  STATE_UPDATE_ACTION,
+  RUNTIME_CONDITION_VARIABLE,
+} from '../src/constants.js';
 
 /** Helper to find a node by developer_name in compiled output */
 function findNode(output: ReturnType<typeof compile>['output'], name: string) {
@@ -730,5 +736,224 @@ connected_subagent Order_Agent:
 `;
     const { diagnostics } = compile(parseSource(source));
     expect(diagnostics).toHaveLength(0);
+  });
+});
+
+describe('connected_subagent after_response', () => {
+  const baseConfig = `
+config:
+    agent_name: "TestBot"
+
+start_agent Main:
+    description: "Main topic"
+    reasoning:
+        instructions: ->
+            | Handle requests
+`;
+
+  it('should not emit after_response when omitted', () => {
+    const source = `
+${baseConfig}
+connected_subagent Order_Agent:
+    target: "agent://Order_Agent"
+    label: "Order Agent"
+    description: "Handles orders"
+`;
+    const { output } = compile(parseSource(source));
+    const node = findNode(output, 'Order_Agent') as Record<string, unknown>;
+
+    expect(node).toBeDefined();
+    expect(node.after_response).toBeUndefined();
+  });
+
+  it('should compile a set directive into a state update action', () => {
+    const source = `
+${baseConfig}
+variables:
+    Refund_Done: mutable boolean
+
+connected_subagent Order_Agent:
+    target: "agent://Order_Agent"
+    label: "Order Agent"
+    description: "Handles orders"
+    after_response:
+        set @variables.Refund_Done = True
+`;
+    const { output } = compile(parseSource(source));
+    const node = findNode(output, 'Order_Agent') as Record<string, unknown>;
+
+    expect(node.after_response).toBeDefined();
+    const actions = node.after_response as Record<string, unknown>[];
+
+    const setAction = actions.find(
+      a =>
+        a.target === STATE_UPDATE_ACTION &&
+        Array.isArray(a.state_updates) &&
+        (a.state_updates as Record<string, string>[]).some(
+          su => 'Refund_Done' in su
+        )
+    );
+    expect(setAction).toBeDefined();
+  });
+
+  it('should compile a transition directive into state update + handoff', () => {
+    const source = `
+${baseConfig}
+topic Wrap_Up:
+    description: "Wrap up"
+    reasoning:
+        instructions: ->
+            | Wrap up
+
+connected_subagent Order_Agent:
+    target: "agent://Order_Agent"
+    label: "Order Agent"
+    description: "Handles orders"
+    after_response:
+        transition to @topic.Wrap_Up
+`;
+    const { output } = compile(parseSource(source));
+    const node = findNode(output, 'Order_Agent') as Record<string, unknown>;
+
+    expect(node.after_response).toBeDefined();
+    const actions = node.after_response as Record<string, unknown>[];
+
+    const handoff = actions.find(
+      a => a.type === 'handoff' && a.target === 'Wrap_Up'
+    ) as Record<string, unknown> | undefined;
+    expect(handoff).toBeDefined();
+    expect(handoff!.enabled).toBe(`state.${NEXT_TOPIC_VARIABLE}=="Wrap_Up"`);
+    expect(handoff!.state_updates).toEqual([
+      { [NEXT_TOPIC_VARIABLE]: EMPTY_TOPIC_VALUE },
+    ]);
+  });
+
+  it('should compile if/else directives with runtime condition gating', () => {
+    const source = `
+${baseConfig}
+variables:
+    Refund_Done: mutable boolean
+    Refund_Failed: mutable boolean
+
+connected_subagent Order_Agent:
+    target: "agent://Order_Agent"
+    label: "Order Agent"
+    description: "Handles orders"
+    after_response:
+        if @variables.Refund_Done:
+            set @variables.Refund_Failed = False
+        else:
+            set @variables.Refund_Failed = True
+`;
+    const { output } = compile(parseSource(source));
+    const node = findNode(output, 'Order_Agent') as Record<string, unknown>;
+
+    expect(node.after_response).toBeDefined();
+    const actions = node.after_response as Record<string, unknown>[];
+
+    // Should set the runtime-condition variable from the @variables.Refund_Done expression
+    const condUpdate = actions.find(
+      a =>
+        a.target === STATE_UPDATE_ACTION &&
+        Array.isArray(a.state_updates) &&
+        (a.state_updates as Record<string, string>[]).some(
+          su => RUNTIME_CONDITION_VARIABLE in su
+        )
+    );
+    expect(condUpdate).toBeDefined();
+
+    // Should have one Refund_Failed update gated by positive runtime condition
+    // and one gated by the negation.
+    const refundFailedUpdates = actions.filter(
+      a =>
+        a.target === STATE_UPDATE_ACTION &&
+        Array.isArray(a.state_updates) &&
+        (a.state_updates as Record<string, string>[]).some(
+          su => 'Refund_Failed' in su
+        )
+    );
+    expect(refundFailedUpdates.length).toBe(2);
+    const enabledClauses = refundFailedUpdates.map(a => a.enabled as string);
+    expect(
+      enabledClauses.some(e =>
+        e?.includes(`state.${RUNTIME_CONDITION_VARIABLE}`)
+      )
+    ).toBe(true);
+    expect(
+      enabledClauses.some(e =>
+        e?.includes(`not (state.${RUNTIME_CONDITION_VARIABLE})`)
+      )
+    ).toBe(true);
+  });
+
+  it('should compile after_response with a mix of set and transition', () => {
+    const source = `
+${baseConfig}
+variables:
+    Refund_Done: mutable boolean
+
+topic Wrap_Up:
+    description: "Wrap up"
+    reasoning:
+        instructions: ->
+            | Wrap up
+
+connected_subagent Order_Agent:
+    target: "agent://Order_Agent"
+    label: "Order Agent"
+    description: "Handles orders"
+    after_response:
+        set @variables.Refund_Done = True
+        transition to @topic.Wrap_Up
+`;
+    const { output } = compile(parseSource(source));
+    const node = findNode(output, 'Order_Agent') as Record<string, unknown>;
+
+    expect(node.after_response).toBeDefined();
+    const actions = node.after_response as Record<string, unknown>[];
+
+    expect(
+      actions.some(
+        a =>
+          a.target === STATE_UPDATE_ACTION &&
+          Array.isArray(a.state_updates) &&
+          (a.state_updates as Record<string, string>[]).some(
+            su => 'Refund_Done' in su
+          )
+      )
+    ).toBe(true);
+    expect(
+      actions.some(a => a.type === 'handoff' && a.target === 'Wrap_Up')
+    ).toBe(true);
+  });
+
+  it('should emit a diagnostic for transition to @connected_subagent.X in after_response', () => {
+    const source = `
+${baseConfig}
+connected_subagent Order_Agent:
+    target: "agent://Order_Agent"
+    label: "Order Agent"
+    description: "Handles orders"
+    after_response:
+        transition to @connected_subagent.Other_Agent
+
+connected_subagent Other_Agent:
+    target: "agent://Other_Agent"
+    label: "Other Agent"
+    description: "Other connected agent"
+`;
+    const { diagnostics } = compile(parseSource(source));
+    const errors = diagnostics.filter(
+      d => d.severity === DiagnosticSeverity.Warning
+    );
+    // The compile-utils warnIfConnectedAgentTransition path issues a warning
+    // when a transition statement targets a connected subagent.
+    expect(
+      errors.some(
+        d =>
+          typeof d.message === 'string' &&
+          d.message.toLowerCase().includes('connected agent')
+      )
+    ).toBe(true);
   });
 });

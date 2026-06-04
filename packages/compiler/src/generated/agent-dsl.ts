@@ -791,6 +791,7 @@ export const relatedAgentNode = z.object({
   invocation_target_name: z.string().nullish(),
   loading_text: z.string().nullish(),
   bound_inputs: z.record(z.string(), z.unknown()).nullish(),
+  after_response: z.array(actionOrHandoff).nullish(),
   on_init: z.array(actionOrHandoff).nullish(),
   transitions: z.array(relatedAgentNodeTransition).nullish(),
   on_exit: z.array(action).nullish(),
