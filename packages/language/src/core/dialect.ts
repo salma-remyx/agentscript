@@ -560,7 +560,7 @@ export class Dialect {
           const ownDiag = createDiagnostic(
             keyRange,
             message,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             code,
             {
               ...(suggestion ? { suggestion } : {}),

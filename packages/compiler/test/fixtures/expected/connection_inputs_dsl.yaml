@@ -57,13 +57,37 @@ agent_version:
         - type: action
           target: provide_support
           bound_inputs: {}
-          llm_inputs: []
+          llm_inputs:
+            - query
           state_updates: []
           name: help_customer
           description: Provide customer support
       developer_name: main
       label: Main
-      action_definitions: []
+      action_definitions:
+        - developer_name: provide_support
+          label: Provide Support
+          description: Provide support to the customer
+          require_user_confirmation: false
+          include_in_progress_indicator: false
+          invocation_target_type: flow
+          invocation_target_name: CustomerSupport
+          input_type:
+            - developer_name: query
+              label: Query
+              description: Query
+              data_type: String
+              is_list: false
+              required: true
+              is_user_input: false
+          output_type:
+            - developer_name: response
+              label: Response
+              description: Response
+              data_type: String
+              is_list: false
+              is_used_by_planner: true
+              is_displayable: false
       instructions: You are a customer service agent with configurable surface parameters.
       focus_prompt: "{{state.AgentScriptInternal_agent_instructions}}"
       before_reasoning_iteration:

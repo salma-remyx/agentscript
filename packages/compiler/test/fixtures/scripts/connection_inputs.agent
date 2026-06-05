@@ -34,6 +34,16 @@ connection service_email:
 start_agent main:
     description: "Main agent entry point"
 
+    actions:
+        provide_support:
+            description: "Provide support to the customer"
+            inputs:
+                query: string
+                    is_required: True
+            outputs:
+                response: string
+            target: "flow://CustomerSupport"
+
     reasoning:
         instructions: ->
             | Assist customers with their inquiries.
@@ -42,13 +52,3 @@ start_agent main:
         actions:
             help_customer: @actions.provide_support
                 description: "Provide customer support"
-
-actions:
-    provide_support:
-        description: "Provide support to the customer"
-        inputs:
-            query: string
-                is_required: True
-        outputs:
-            response: string
-        target: "flow://CustomerSupport"
