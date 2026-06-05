@@ -821,7 +821,9 @@ topic self_service:
     );
     expect(errors).toHaveLength(1);
     expect(errors[0].severity).toBe(DiagnosticSeverity.Error);
-    expect(errors[0].message).toContain('@utils.transition');
+    expect(errors[0].message).toContain(
+      'Only @utils.transition reasoning actions are allowed when using model:'
+    );
   });
 
   it('reports error for each non-transition action', () => {
@@ -873,7 +875,7 @@ topic self_service:
     expect(errors).toHaveLength(1);
     expect(errors[0].severity).toBe(DiagnosticSeverity.Error);
     expect(errors[0].message).toContain(
-      'before_reasoning directives are not allowed when using model:'
+      "before_reasoning is not allowed when using model: model://sfdc_ai__DefaultEinsteinHyperClassifier. Use 'reasoning.instructions' to specify inline actions."
     );
   });
 
@@ -894,7 +896,7 @@ topic self_service:
     expect(errors).toHaveLength(1);
     expect(errors[0].severity).toBe(DiagnosticSeverity.Error);
     expect(errors[0].message).toContain(
-      'after_reasoning directives are not allowed when using model:'
+      'after_reasoning is not allowed when using model: model://sfdc_ai__DefaultEinsteinHyperClassifier. Use post-action logic attached to reasoning.actions instead.'
     );
   });
 
