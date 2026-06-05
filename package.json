@@ -7,7 +7,10 @@
   "type": "module",
   "scripts": {
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "turbo run test && pnpm test:scs",
+    "test:scs": "vitest run scripts/scs",
+    "scs:upload": "tsx scripts/scs/upload.ts",
+    "scs:smoke": "tsx scripts/scs/smoke.ts",
     "lint": "turbo run lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -46,6 +49,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
+    "@grpc/grpc-js": "^1.14.4",
     "@qiwi/multi-semantic-release": "^7.1.2",
     "@semantic-release/git": "^10.0.1",
     "@types/node": "^20.19.41",
@@ -61,6 +65,7 @@
     "lint-staged": "^15.5.2",
     "playwright": "^1.49.0",
     "prettier": "^3.8.3",
+    "protobufjs": "^8.5.0",
     "semantic-release": "^21.1.2",
     "tsx": "^4.21.0",
     "turbo": "^2.9.12",
@@ -68,6 +73,7 @@
     "typedoc-plugin-markdown": "4.2.10",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.3",
+    "vitest": "^3.2.4",
     "yaml": "^2.9.0"
   },
   "engines": {
