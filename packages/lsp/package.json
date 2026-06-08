@@ -1,6 +1,6 @@
 {
   "name": "@agentscript/lsp",
-  "version": "2.3.8",
+  "version": "2.3.9",
   "description": "Language Server Protocol implementation for AgentScript — dialect-agnostic core",
   "type": "module",
   "main": "dist/index.js",
@@ -25,7 +25,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@agentscript/agentforce-dialect": "2.13.4",
+    "@agentscript/agentforce-dialect": "2.13.5",
     "@agentscript/agentscript-dialect": "2.11.1",
     "@agentscript/language": "2.8.4",
     "@agentscript/parser": "4.0.2",
