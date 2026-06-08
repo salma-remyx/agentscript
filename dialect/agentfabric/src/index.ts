@@ -87,6 +87,19 @@ export type {
 export { defaultRules } from './lint/passes/index.js';
 export { createLintEngine } from './lint/index.js';
 
+// ── Graph re-exports ─────────────────────────────────────────────────
+
+export { extractGraph, getGraph } from './graph/index.js';
+export type {
+  GraphNode,
+  GraphEdge,
+  ExtractedGraph,
+  EdgeProvenance,
+  Graph,
+  ProtocolNode,
+  ProtocolEdge,
+} from './graph/index.js';
+
 // ── Dialect config ──────────────────────────────────────────────────
 
 export const agentfabricDialect: DialectConfig = {

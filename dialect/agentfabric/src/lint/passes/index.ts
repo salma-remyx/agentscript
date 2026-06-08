@@ -18,10 +18,13 @@ import {
   emptyBlockPass,
   expressionValidationPass,
   spreadContextPass,
+  unusedVariablePass,
 } from '@agentscript/language';
 import { agentFabricSemanticPass } from './agentfabric-semantic.js';
+import { strictSchemaValidationPass } from './strict-schema-validation.js';
 import { suppressActionsNamespaceUndefinedReferencePass } from './suppress-tools-namespace-undefined-reference.js';
 import { spreadOperandTypePass } from './spread-operand-type.js';
+import { unusedNodePass } from './rules/unused-node.js';
 import type { ExpressionValidationOptions } from '@agentscript/language/lint';
 import { AgentFabricSchemaInfo } from '../../schema.js';
 
@@ -58,11 +61,14 @@ export function defaultRules(): LintPass[] {
     constraintValidationPass(),
     positionIndexPass(),
     unreachableCodePass(),
+    unusedVariablePass(),
     emptyBlockPass(),
     expressionValidationPass(expressionOptions),
     spreadContextPass(),
     spreadOperandTypePass(),
     agentFabricSemanticPass(),
+    unusedNodePass(),
+    strictSchemaValidationPass(),
     // Validation
     undefinedReferencePass(),
     suppressActionsNamespaceUndefinedReferencePass(),

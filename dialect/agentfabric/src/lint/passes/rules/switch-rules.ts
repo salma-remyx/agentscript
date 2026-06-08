@@ -11,36 +11,11 @@ import type { PassStore } from '@agentscript/language';
 import {
   asObjectList,
   attachError,
-  collectStatementKinds,
   extractSwitchTarget,
   extractWhenString,
   isBooleanLikeExpression,
   type AstLike,
 } from './shared.js';
-
-function reportDeprecatedSwitchChoices(
-  switchEntry: Record<string, unknown>,
-  normalizedName: string
-): void {
-  if (switchEntry.choices !== undefined) {
-    attachError(
-      switchEntry as AstLike,
-      `router '${normalizedName}' uses deprecated 'choices'. Use 'routes' and required 'otherwise' instead.`,
-      'switch-choices-deprecated'
-    );
-  }
-}
-
-function validateSwitchOnExit(switchEntry: Record<string, unknown>): void {
-  const onExit = switchEntry.on_exit;
-  if (onExit !== undefined && collectStatementKinds(onExit).length > 0) {
-    attachError(
-      switchEntry as AstLike,
-      'router nodes must not define on_exit transitions.',
-      'switch-on-exit'
-    );
-  }
-}
 
 function validateSwitchRoutes(
   switchEntry: Record<string, unknown>,
@@ -115,8 +90,6 @@ export function checkSwitchRules(
     const switchEntry = entry as Record<string, unknown>;
     const normalizedName = normalizeId(name);
 
-    reportDeprecatedSwitchChoices(switchEntry, normalizedName);
-    validateSwitchOnExit(switchEntry);
     validateSwitchRoutes(switchEntry, normalizedName);
     validateSwitchElse(switchEntry, normalizedName);
   }

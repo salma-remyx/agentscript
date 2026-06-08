@@ -16,9 +16,9 @@ import {
   UnaryExpression,
 } from '@agentscript/language';
 import { normalizeId } from '../../utils.js';
-
-const AGENTFABRIC_LINT_SOURCE = 'agentfabric-lint';
+export const AGENTFABRIC_LINT_SOURCE = 'agentfabric-lint';
 const ERROR_SEVERITY = 1;
+const WARNING_SEVERITY = 2;
 
 interface ExpressionLike {
   __kind?: string;
@@ -43,10 +43,11 @@ export interface AstLike {
   __cst?: CstLike;
 }
 
-export function attachError(
+function attachDiagnosticAt(
   node: AstLike,
   message: string,
-  code: string
+  code: string,
+  severity: number
 ): void {
   if (!Array.isArray(node.__diagnostics)) return;
   const range =
@@ -59,10 +60,26 @@ export function attachError(
   attachDiagnostic(node as never, {
     range: range as never,
     message,
-    severity: ERROR_SEVERITY,
+    severity: severity as never,
     code,
     source: AGENTFABRIC_LINT_SOURCE,
   });
+}
+
+export function attachError(
+  node: AstLike,
+  message: string,
+  code: string
+): void {
+  attachDiagnosticAt(node, message, code, ERROR_SEVERITY);
+}
+
+export function attachWarning(
+  node: AstLike,
+  message: string,
+  code: string
+): void {
+  attachDiagnosticAt(node, message, code, WARNING_SEVERITY);
 }
 
 export function asStatements(value: unknown): StatementLike[] {
