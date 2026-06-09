@@ -17,8 +17,8 @@
     "src"
   ],
   "scripts": {
-    "prebuild": "node ../../scripts/sync-pkg-meta.mjs",
-    "build": "tsc",
+    "sync-meta": "node ../../scripts/sync-pkg-meta.mjs",
+    "build": "yarn sync-meta && tsc",
     "dev": "tsc --watch",
     "test": "vitest run --coverage --coverage.reporter=lcov --coverage.reporter=json-summary --coverage.reportsDirectory=coverage",
     "test:watch": "vitest",
@@ -26,11 +26,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@agentscript/agentscript-dialect": "2.11.1",
-    "@agentscript/language": "2.8.4"
+    "@agentscript/agentscript-dialect": "workspace:*",
+    "@agentscript/language": "workspace:*"
   },
   "devDependencies": {
-    "@agentscript/parser": "4.0.2",
+    "@agentscript/parser": "workspace:*",
     "tree-sitter": "^0.25.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.6"
