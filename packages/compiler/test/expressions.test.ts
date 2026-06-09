@@ -254,12 +254,12 @@ describe('compileExpression', () => {
 
   describe('@knowledge references', () => {
     it('should resolve @knowledge eagerly from context', () => {
-      ctx.knowledgeFields.set('api_key', "'sk-123'");
+      ctx.knowledgeFields.set('api_key', 'sk-123');
       const expr = new MemberExpression(
         new AtIdentifier('knowledge'),
         'api_key'
       );
-      expect(compileExpression(expr, ctx)).toBe("'sk-123'");
+      expect(compileExpression(expr, ctx)).toBe('"sk-123"');
     });
 
     it('should error for unknown @knowledge field', () => {

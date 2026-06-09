@@ -257,6 +257,10 @@ export const FIXTURE_PAIRS: [string, string][] = [
     'edge_knowledge_escalation_combo_dsl.yaml',
   ],
   ['edge_knowledge_in_topic.agent', 'edge_knowledge_in_topic_dsl.yaml'],
+  [
+    'edge_knowledge_with_clauses.agent',
+    'edge_knowledge_with_clauses_dsl.yaml',
+  ],
   ['edge_locale_multiple.agent', 'edge_locale_multiple_dsl.yaml'],
   ['edge_locale_non_us.agent', 'edge_locale_non_us_dsl.yaml'],
   ['edge_logistics_tracking.agent', 'edge_logistics_tracking_dsl.yaml'],

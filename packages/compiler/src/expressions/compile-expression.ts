@@ -227,7 +227,7 @@ function compileMemberExpression(
           if (typeof value === 'boolean') {
             return value ? 'True' : 'False';
           }
-          return value;
+          return `"${escapeStringValue(value)}"`;
         }
         ctx.error(`Unknown @knowledge field: '${property}'`, expr.__cst?.range);
         return '';
