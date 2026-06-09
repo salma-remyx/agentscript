@@ -23,9 +23,7 @@
     "docs:serve": "yarn workspace @agentscript/docs serve",
     "docs:typedoc": "typedoc",
     "ui:dev": "yarn workspace @agentscript/ui dev",
-    "release:dry": "lerna version --conventional-commits --no-push --no-git-tag-version --yes",
-    "release:version": "lerna version --conventional-commits --yes",
-    "release:publish": "lerna publish from-git --yes",
+    "release:dry": "multi-semantic-release --dry-run",
     "prepare": "husky"
   },
   "workspaces": [
@@ -60,6 +58,9 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@grpc/grpc-js": "^1.14.4",
+    "@qiwi/multi-semantic-release": "^7.1.2",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@types/node": "^20.19.41",
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
@@ -75,6 +76,7 @@
     "playwright": "^1.49.0",
     "prettier": "^3.8.3",
     "protobufjs": "^8.5.0",
+    "semantic-release": "^21.1.2",
     "tsx": "^4.21.0",
     "turbo": "^2.9.12",
     "typedoc": "0.26.11",

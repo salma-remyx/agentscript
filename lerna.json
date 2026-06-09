@@ -3,20 +3,9 @@
   "version": "independent",
   "npmClient": "yarn",
   "command": {
-    "version": {
-      "conventionalCommits": true,
-      "message": "chore(release): publish @skip-ci@",
-      "allowBranch": "master",
-      "exact": true
-    },
     "publish": {
       "ignoreScripts": false,
       "noVerifyAccess": true
     }
-  },
-  "ignoreChanges": [
-    "**/*.md",
-    "**/test/**",
-    "**/CHANGELOG.md"
-  ]
+  }
 }
