@@ -28,7 +28,6 @@ import {
 } from '../ast-helpers.js';
 import type { Sourceable } from '../sourced.js';
 import { TRANSITION_TARGET_NAMESPACES } from '../constants.js';
-import { warnIfConnectedAgentTransition } from './compile-utils.js';
 
 /**
  * Compile a single reasoning action (tool) from a topic's reasoning block.
@@ -428,7 +427,6 @@ function compileTransitionInConditional(
   // TransitionStatement contains clauses which should include ToClause
   for (const clause of stmt.clauses) {
     if (clause instanceof ToClause) {
-      if (warnIfConnectedAgentTransition(clause.target, ctx)) continue;
       const targetTopicName = resolveAtReference(
         clause.target,
         TRANSITION_TARGET_NAMESPACES,

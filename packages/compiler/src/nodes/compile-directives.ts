@@ -23,7 +23,6 @@ import {
 import { compileExpression } from '../expressions/compile-expression.js';
 import { compileTemplateValue } from '../expressions/compile-template.js';
 import { resolveAtReference } from '../ast-helpers.js';
-import { warnIfConnectedAgentTransition } from './compile-utils.js';
 
 /**
  * Compile a list of deterministic directives (before_reasoning, after_reasoning)
@@ -213,7 +212,6 @@ function compileTransitionDirective(
 
   for (const clause of stmt.clauses) {
     if (clause instanceof ToClause) {
-      if (warnIfConnectedAgentTransition(clause.target, ctx)) continue;
       const targetName = resolveAtReference(
         clause.target,
         TRANSITION_TARGET_NAMESPACES,

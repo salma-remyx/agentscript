@@ -11,7 +11,6 @@ export { systemMessageVariablesRule } from './system-message-variables.js';
 export {
   boundInputsRule,
   isSimpleVariableReference,
-  noTransitionRule,
   connectedAgentTargetPass,
   templateReferenceValidationPass,
 } from './connected-agents/index.js';
@@ -30,7 +29,6 @@ import { connectionValidationRule } from './connection-validation.js';
 import { systemMessageVariablesRule } from './system-message-variables.js';
 import {
   boundInputsRule,
-  noTransitionRule,
   connectedAgentTargetPass,
   templateReferenceValidationPass,
 } from './connected-agents/index.js';
@@ -50,7 +48,6 @@ export function defaultRules(): LintPass[] {
     connectionValidationRule(),
     systemMessageVariablesRule(),
     boundInputsRule(),
-    noTransitionRule(),
     connectedAgentTargetPass(),
     templateReferenceValidationPass(),
     configValidationRule(),

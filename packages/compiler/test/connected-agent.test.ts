@@ -322,7 +322,7 @@ connected_subagent Order_Agent:
     expect(agentTool!.target).toBe('Order_Agent');
   });
 
-  it('should warn when transitioning to @connected_subagent.X in reasoning', () => {
+  it('should not emit any error or warning for transition to @connected_subagent.X', () => {
     const source = `
 ${baseConfig}
     reasoning:
@@ -331,32 +331,8 @@ ${baseConfig}
         actions:
             transfer: @utils.transition to @connected_subagent.Support_Agent
                 description: "Transfer to support"
-
-connected_subagent Support_Agent:
-    target: "agent://Support_Agent"
-    label: "Support Agent"
-    description: "Handles support"
-`;
-    const { output, diagnostics } = compile(parseSource(source));
-    const transitionWarnings = diagnostics.filter(d =>
-      d.message.includes('Transition to connected agent')
-    );
-    expect(transitionWarnings.length).toBeGreaterThan(0);
-    expect(transitionWarnings[0].severity).toBe(DiagnosticSeverity.Warning);
-
-    // Warning should not block compilation — transition tool should still be present
-    const node = findNode(output, 'Main');
-    expect(node?.tools.some(t => t.name === 'transfer')).toBe(true);
-  });
-
-  it('should warn when transitioning to @connected_subagent.X in after_reasoning', () => {
-    const source = `
-${baseConfig}
     after_reasoning:
         transition to @connected_subagent.Support_Agent
-    reasoning:
-        instructions: ->
-            | Help the user.
 
 connected_subagent Support_Agent:
     target: "agent://Support_Agent"
@@ -364,11 +340,12 @@ connected_subagent Support_Agent:
     description: "Handles support"
 `;
     const { diagnostics } = compile(parseSource(source));
-    const transitionWarnings = diagnostics.filter(d =>
-      d.message.includes('Transition to connected agent')
+    const errorsAndWarnings = diagnostics.filter(
+      d =>
+        d.severity === DiagnosticSeverity.Error ||
+        d.severity === DiagnosticSeverity.Warning
     );
-    expect(transitionWarnings.length).toBeGreaterThan(0);
-    expect(transitionWarnings[0].severity).toBe(DiagnosticSeverity.Warning);
+    expect(errorsAndWarnings).toEqual([]);
   });
 
   it('should warn on unknown input for @connected_subagent.X tool invocation', () => {
@@ -917,36 +894,6 @@ connected_subagent Order_Agent:
     ).toBe(true);
     expect(
       actions.some(a => a.type === 'handoff' && a.target === 'Wrap_Up')
-    ).toBe(true);
-  });
-
-  it('should emit a diagnostic for transition to @connected_subagent.X in after_response', () => {
-    const source = `
-${baseConfig}
-connected_subagent Order_Agent:
-    target: "agent://Order_Agent"
-    label: "Order Agent"
-    description: "Handles orders"
-    after_response:
-        transition to @connected_subagent.Other_Agent
-
-connected_subagent Other_Agent:
-    target: "agent://Other_Agent"
-    label: "Other Agent"
-    description: "Other connected agent"
-`;
-    const { diagnostics } = compile(parseSource(source));
-    const errors = diagnostics.filter(
-      d => d.severity === DiagnosticSeverity.Warning
-    );
-    // The compile-utils warnIfConnectedAgentTransition path issues a warning
-    // when a transition statement targets a connected subagent.
-    expect(
-      errors.some(
-        d =>
-          typeof d.message === 'string' &&
-          d.message.toLowerCase().includes('connected agent')
-      )
     ).toBe(true);
   });
 });

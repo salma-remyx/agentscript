@@ -22,7 +22,6 @@ import {
 import type { Sourceable } from '../sourced.js';
 import { normalizeDeveloperName } from '../utils.js';
 import { compileExpression } from '../expressions/compile-expression.js';
-import { warnIfConnectedAgentTransition } from './compile-utils.js';
 
 /**
  * Compile a @utils.transition reasoning action.
@@ -50,7 +49,6 @@ export function compileTransition(
 
   for (const stmt of body) {
     if (stmt instanceof ToClause) {
-      warnIfConnectedAgentTransition(stmt.target, ctx);
       const targetName = resolveAtReference(
         stmt.target,
         TRANSITION_TARGET_NAMESPACES,
@@ -80,7 +78,6 @@ export function compileTransition(
     } else if (stmt instanceof TransitionStatement) {
       for (const clause of stmt.clauses) {
         if (clause instanceof ToClause) {
-          warnIfConnectedAgentTransition(clause.target, ctx);
           const targetName = resolveAtReference(
             clause.target,
             TRANSITION_TARGET_NAMESPACES,
@@ -107,7 +104,6 @@ export function compileTransition(
     // The colinear value might encode a target (not typical for AgentForce)
     const colinear = actionDef.value;
     if (colinear) {
-      warnIfConnectedAgentTransition(colinear as Expression, ctx);
       const targetName = resolveAtReference(
         colinear as Expression,
         TRANSITION_TARGET_NAMESPACES,

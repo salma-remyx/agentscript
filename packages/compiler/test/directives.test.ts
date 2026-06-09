@@ -6,7 +6,6 @@
  */
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/compile.js';
-import { DiagnosticSeverity } from '../src/diagnostics.js';
 import { parseSource } from './test-utils.js';
 import {
   NEXT_TOPIC_VARIABLE,
@@ -117,33 +116,5 @@ topic destination:
 
     // Successful compilation should produce zero diagnostics
     expect(diagnostics).toHaveLength(0);
-  });
-
-  it('should warn when transitioning to @connected_subagent.X in before_reasoning', () => {
-    const source = `
-config:
-    agent_name: "TestBot"
-    agent_type: "AgentforceServiceAgent"
-    default_agent_user: "test@example.com"
-
-start_agent main:
-    description: "Main topic"
-    before_reasoning:
-        transition to @connected_subagent.Support_Agent
-    reasoning:
-        instructions: ->
-            | Help the user.
-
-connected_subagent Support_Agent:
-    target: "agent://Support_Agent"
-    label: "Support Agent"
-    description: "Handles support"
-`;
-    const { diagnostics } = compile(parseSource(source));
-    const transitionWarnings = diagnostics.filter(d =>
-      d.message.includes('Transition to connected agent')
-    );
-    expect(transitionWarnings.length).toBeGreaterThan(0);
-    expect(transitionWarnings[0].severity).toBe(DiagnosticSeverity.Warning);
   });
 });

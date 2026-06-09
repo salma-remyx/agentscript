@@ -15,7 +15,6 @@ import {
 import type { Sourceable } from '../sourced.js';
 import { TRANSITION_TARGET_NAMESPACES } from '../constants.js';
 import { compileExpression } from '../expressions/compile-expression.js';
-import { warnIfConnectedAgentTransition } from './compile-utils.js';
 
 /**
  * Compile a supervision reasoning action (e.g. @topic.X or @subagent.X).
@@ -36,7 +35,6 @@ export function compileSupervision(
 
   for (const stmt of body) {
     if (stmt instanceof ToClause) {
-      if (warnIfConnectedAgentTransition(stmt.target, ctx)) continue;
       const resolved = resolveAtReference(
         stmt.target,
         TRANSITION_TARGET_NAMESPACES,
@@ -47,7 +45,6 @@ export function compileSupervision(
     } else if (stmt instanceof TransitionStatement) {
       for (const clause of stmt.clauses) {
         if (clause instanceof ToClause) {
-          if (warnIfConnectedAgentTransition(clause.target, ctx)) continue;
           const resolved = resolveAtReference(
             clause.target,
             TRANSITION_TARGET_NAMESPACES,
@@ -66,15 +63,13 @@ export function compileSupervision(
   if (!targetName) {
     const colinear = actionDef.value;
     if (colinear) {
-      if (!warnIfConnectedAgentTransition(colinear as Expression, ctx)) {
-        const resolved = resolveAtReference(
-          colinear as Expression,
-          TRANSITION_TARGET_NAMESPACES,
-          ctx,
-          'transition target'
-        );
-        if (resolved) targetName = resolved;
-      }
+      const resolved = resolveAtReference(
+        colinear as Expression,
+        TRANSITION_TARGET_NAMESPACES,
+        ctx,
+        'transition target'
+      );
+      if (resolved) targetName = resolved;
     }
   }
 

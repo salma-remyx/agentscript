@@ -54,7 +54,6 @@ import { normalizeDeveloperName, dedent } from '../utils.js';
 import { compileActionDefinitions } from './compile-actions.js';
 import { compileDeterministicDirectives } from './compile-directives.js';
 import { resolveActionType } from './resolve-action-type.js';
-import { warnIfConnectedAgentTransition } from './compile-utils.js';
 import { compileReasoningActions } from './compile-reasoning-actions.js';
 
 /**
@@ -263,7 +262,6 @@ function compileReasoningTools(
         let foundTarget = false;
         for (const stmt of body) {
           if (stmt instanceof ToClause) {
-            if (warnIfConnectedAgentTransition(stmt.target, ctx)) continue;
             const targetName = resolveAtReference(
               stmt.target,
               TRANSITION_TARGET_NAMESPACES,
@@ -277,8 +275,6 @@ function compileReasoningTools(
           } else if (stmt instanceof TransitionStatement) {
             for (const clause of stmt.clauses) {
               if (clause instanceof ToClause) {
-                if (warnIfConnectedAgentTransition(clause.target, ctx))
-                  continue;
                 const targetName = resolveAtReference(
                   clause.target,
                   TRANSITION_TARGET_NAMESPACES,
@@ -295,16 +291,14 @@ function compileReasoningTools(
         }
         // Fallback: check colinear value for inline target (only if no target found in body)
         if (!foundTarget && def.value) {
-          if (!warnIfConnectedAgentTransition(def.value as Expression, ctx)) {
-            const targetName = resolveAtReference(
-              def.value as Expression,
-              TRANSITION_TARGET_NAMESPACES,
-              ctx,
-              'transition target'
-            );
-            if (targetName) {
-              ctx.actionReferenceMap.set(targetName, actionKey);
-            }
+          const targetName = resolveAtReference(
+            def.value as Expression,
+            TRANSITION_TARGET_NAMESPACES,
+            ctx,
+            'transition target'
+          );
+          if (targetName) {
+            ctx.actionReferenceMap.set(targetName, actionKey);
           }
         }
       }
