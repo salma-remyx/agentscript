@@ -446,6 +446,31 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@24.13.1)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
+  packages/agentfabric-compiler:
+    dependencies:
+      '@agentscript/agentfabric-dialect':
+        specifier: workspace:*
+        version: link:../../dialect/agentfabric
+      '@agentscript/language':
+        specifier: workspace:*
+        version: link:../language
+    devDependencies:
+      '@agentscript/parser':
+        specifier: workspace:*
+        version: link:../parser
+      tree-sitter:
+        specifier: ^0.25.0
+        version: 0.25.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.6(@types/debug@4.1.13)(@types/node@24.13.1)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
+
   packages/agentforce:
     dependencies:
       '@agentscript/agentforce-dialect':
