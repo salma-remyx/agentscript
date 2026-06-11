@@ -1,6 +1,6 @@
 {
   "name": "@agentscript/agentscript-dialect",
-  "version": "2.5.20",
+  "version": "2.11.1",
   "description": "AgentScript dialect — schema, lint rules, and dialect config",
   "type": "module",
   "main": "dist/index.js",
