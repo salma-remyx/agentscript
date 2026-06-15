@@ -50,6 +50,8 @@ class TransitionTargetPass implements LintPass {
       const toClauses = stmt.clauses.filter(c => c instanceof ToClause);
       const range = stmt.__cst?.range;
       if (!range) continue;
+      // Type narrowing for attachDiagnostic; runtime guaranteed by enterNode.
+      if (!isAstNodeLike(stmt)) continue;
 
       if (toClauses.length === 0) {
         // Highlight just the `transition` keyword token (first child of the
