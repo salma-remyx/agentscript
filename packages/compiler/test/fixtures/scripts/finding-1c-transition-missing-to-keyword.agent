@@ -1,0 +1,16 @@
+config:
+    agent_name: "Finding1c"
+
+start_agent main:
+    description: "common typo — `transition @subagent.x` (forgot the `to` keyword)"
+    before_reasoning:
+        transition @subagent.a
+    reasoning:
+        instructions: ->
+            | hello
+
+subagent a:
+    description: "a"
+    reasoning:
+        instructions: ->
+            | I am A
