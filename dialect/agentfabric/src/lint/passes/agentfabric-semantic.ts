@@ -18,6 +18,7 @@ import { checkOutputStructureRules } from './rules/output-structure-rules.js';
 import { checkReasoningInstructionsRules } from './rules/reasoning-instructions-rules.js';
 import { checkSwitchRules } from './rules/switch-rules.js';
 import { checkTerminalStatusRules } from './rules/terminal-status-rules.js';
+import { checkTransitionTargetRules } from './rules/transition-target-rules.js';
 import { checkTriggerRules } from './rules/trigger-rules.js';
 
 class AgentFabricSemanticPass implements LintPass {
@@ -36,6 +37,7 @@ class AgentFabricSemanticPass implements LintPass {
     checkExecuteRules(root);
     checkActionBindingRules(root);
     checkCycleRules(root);
+    checkTransitionTargetRules(root);
     checkTerminalStatusRules(root);
   }
 }
