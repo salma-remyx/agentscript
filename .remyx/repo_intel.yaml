@@ -1,6 +1,18 @@
 schema_version: 1
 fork: salma-remyx/agentscript
-observed_landing_zones: []
+observed_landing_zones:
+- path: dialect/agentfabric/src/lint/passes/
+  shape_tags:
+  - unclassified
+  confirmed_by:
+  - arxiv: 2607.09175v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: AgentFabricSemanticPass.finalize() in dialect/agentfabric/src/lint/passes/agentfabric-semantic.ts
+      (line 40, alongside checkCycleRules / checkTerminalStatusRules); that pass is
+      registered in defaultRul
+    branch: scoped-verification-for-reliable-long-horizon-agentic-contex
+    timestamp: '2026-07-22T16:15:22Z'
+  last_observed: '2026-07-22T16:15:22Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -11,4 +23,4 @@ rejected_shapes:
   - arxiv: 2607.07702v1
     timestamp: '2026-07-20T23:43:26Z'
 coordination_signals: []
-last_updated: '2026-07-20T23:43:26Z'
+last_updated: '2026-07-22T16:15:22Z'
