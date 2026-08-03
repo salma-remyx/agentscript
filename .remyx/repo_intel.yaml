@@ -12,7 +12,14 @@ observed_landing_zones:
       registered in defaultRul
     branch: scoped-verification-for-reliable-long-horizon-agentic-contex
     timestamp: '2026-07-22T16:15:22Z'
-  last_observed: '2026-07-22T16:15:22Z'
+  - arxiv: 2607.14890v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: AgentFabricSemanticPass.finalize() in dialect/agentfabric/src/lint/passes/agentfabric-semantic.ts:41,
+      reached via defaultRules (lint/passes/index.ts:69) -> the agentfabric dialect's
+      createRules (index
+    branch: proof-or-stop-don-t-trust-the-agent-trust-the-evidence----lo
+    timestamp: '2026-08-03T07:15:29Z'
+  last_observed: '2026-08-03T07:15:29Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -23,4 +30,4 @@ rejected_shapes:
   - arxiv: 2607.07702v1
     timestamp: '2026-07-20T23:43:26Z'
 coordination_signals: []
-last_updated: '2026-07-22T16:15:22Z'
+last_updated: '2026-08-03T07:15:29Z'
