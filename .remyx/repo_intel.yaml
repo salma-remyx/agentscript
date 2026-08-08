@@ -19,7 +19,13 @@ observed_landing_zones:
       createRules (index
     branch: proof-or-stop-don-t-trust-the-agent-trust-the-evidence----lo
     timestamp: '2026-08-03T07:15:29Z'
-  last_observed: '2026-08-03T07:15:29Z'
+  - arxiv: 2607.21530v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: 'AgentFabricSemanticPass.finalize() in dialect/agentfabric/src/lint/passes/agentfabric-semantic.ts:41,
+      registered via defaultRules() -> agentfabricDialect.createRules (dialect/agentfabric/src/index.ts:'
+    branch: from-resource-flow-to-executable-tests-petri-net-guided-llm-
+    timestamp: '2026-08-08T03:42:06Z'
+  last_observed: '2026-08-08T03:42:06Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -32,4 +38,4 @@ rejected_shapes:
   - arxiv: 2607.21325v1
     timestamp: '2026-08-04T14:53:34Z'
 coordination_signals: []
-last_updated: '2026-08-04T14:53:34Z'
+last_updated: '2026-08-08T03:42:06Z'
