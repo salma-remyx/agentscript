@@ -39,7 +39,13 @@ observed_landing_zones:
       in passes/inde
     branch: looping-is-not-reliability-state-bound-evidence-and-typed-re
     timestamp: '2026-08-09T15:50:26Z'
-  last_observed: '2026-08-09T15:50:26Z'
+  - arxiv: 2607.24625v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: AgentFabricSemanticPass.finalize (dialect/agentfabric/src/lint/passes/agentfabric-semantic.ts:41),
+      reached via defaultRules() -> createLintEngine() in dialect/agentfabric/src/lint/index.ts
+    branch: agentic-permissions-policy-algebra-for-taint-confinement-in-
+    timestamp: '2026-08-10T08:42:38Z'
+  last_observed: '2026-08-10T08:42:38Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -52,4 +58,4 @@ rejected_shapes:
   - arxiv: 2607.21325v1
     timestamp: '2026-08-04T14:53:34Z'
 coordination_signals: []
-last_updated: '2026-08-09T15:50:26Z'
+last_updated: '2026-08-10T08:42:38Z'
