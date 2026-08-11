@@ -8,6 +8,7 @@
 import { storeKey } from '@agentscript/language';
 import type { LintPass, PassStore } from '@agentscript/language';
 import { checkActionBindingRules } from './rules/action-binding-rules.js';
+import { checkActionSpecGapRules } from './rules/action-spec-gap-rules.js';
 import { checkAgenticLlmRules } from './rules/agentic-llm-rules.js';
 import { checkConnectionUriRules } from './rules/connection-rules.js';
 import { checkCycleRules } from './rules/cycle-rules.js';
@@ -35,6 +36,7 @@ class AgentFabricSemanticPass implements LintPass {
     checkAgenticLlmRules(root);
     checkExecuteRules(root);
     checkActionBindingRules(root);
+    checkActionSpecGapRules(root);
     checkCycleRules(root);
     checkTerminalStatusRules(root);
   }
