@@ -3,7 +3,8 @@ fork: salma-remyx/agentscript
 observed_landing_zones:
 - path: dialect/agentfabric/src/lint/passes/
   shape_tags:
-  - unclassified
+  - library-shape-public-api
+  - registry-add
   confirmed_by:
   - arxiv: 2607.09175v1
     mode: Mode 2 (adapted port)
@@ -45,7 +46,14 @@ observed_landing_zones:
       reached via defaultRules() -> createLintEngine() in dialect/agentfabric/src/lint/index.ts
     branch: agentic-permissions-policy-algebra-for-taint-confinement-in-
     timestamp: '2026-08-10T08:42:38Z'
-  last_observed: '2026-08-10T08:42:38Z'
+  - arxiv: 2603.24284v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: "AgentFabricSemanticPass.finalize() at dialect/agentfabric/src/lint/passes/agentfabric-semantic.ts:39\
+      \ \u2014 reached via the pre-existing defaultRules() registry (passes/index.ts:69)\
+      \ -> agentfabricDialect.c"
+    branch: the-specification-gap-coordination-failure-under-partial-kno
+    timestamp: '2026-08-11T21:04:08Z'
+  last_observed: '2026-08-11T21:04:08Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -58,4 +66,4 @@ rejected_shapes:
   - arxiv: 2607.21325v1
     timestamp: '2026-08-04T14:53:34Z'
 coordination_signals: []
-last_updated: '2026-08-10T08:42:38Z'
+last_updated: '2026-08-11T21:04:08Z'
