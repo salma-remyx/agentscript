@@ -19,6 +19,7 @@ import { checkReasoningInstructionsRules } from './rules/reasoning-instructions-
 import { checkSwitchRules } from './rules/switch-rules.js';
 import { checkTerminalStatusRules } from './rules/terminal-status-rules.js';
 import { checkTriggerRules } from './rules/trigger-rules.js';
+import { checkUntrustedActionFlow } from './rules/untrusted-action-flow.js';
 
 class AgentFabricSemanticPass implements LintPass {
   readonly id = storeKey('agentfabric-semantic');
@@ -37,6 +38,7 @@ class AgentFabricSemanticPass implements LintPass {
     checkActionBindingRules(root);
     checkCycleRules(root);
     checkTerminalStatusRules(root);
+    checkUntrustedActionFlow(root);
   }
 }
 
