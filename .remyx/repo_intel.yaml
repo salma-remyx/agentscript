@@ -59,7 +59,14 @@ observed_landing_zones:
       \ \u2014 `checkUntrustedActionFlow(root)` is invoked alongside `checkCycleRules`/`checkTerminalStatusRule"
     branch: colluskill-adversarial-cross-skill-composition-for-evading-a
     timestamp: '2026-08-12T16:29:47Z'
-  last_observed: '2026-08-12T16:29:47Z'
+  - arxiv: 2608.06346v1
+    mode: Mode 2 (adapted port)
+    call_site_specifics: AgentFabricSemanticPass.finalize() in dialect/agentfabric/src/lint/passes/agentfabric-semantic.ts
+      (invoked as checkErrorLifecycleRules(root)); the pass is registered via defaultRules()
+      in dialect/agen
+    branch: trajdebug-tracing-error-lifecycle-to-identify-critical-failu
+    timestamp: '2026-08-13T13:18:05Z'
+  last_observed: '2026-08-13T13:18:05Z'
 rejected_shapes:
 - shape_tag: null
   reason_code: null
@@ -72,4 +79,4 @@ rejected_shapes:
   - arxiv: 2607.21325v1
     timestamp: '2026-08-04T14:53:34Z'
 coordination_signals: []
-last_updated: '2026-08-12T16:29:47Z'
+last_updated: '2026-08-13T13:18:05Z'
