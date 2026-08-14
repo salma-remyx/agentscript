@@ -1775,6 +1775,159 @@ echo done:
   });
 });
 
+describe('chain-composition rules', () => {
+  function chainDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
+    return diagnostics.filter(d => d.code === 'chain-cross-connection-egress');
+  }
+
+  it('flags an artifact crossing connections before an external send', () => {
+    const source = `
+config:
+  agent_name: "chain-egress"
+
+llm:
+  g:
+    target: "llm://openai"
+    kind: "OpenAI"
+    model: "gpt-4o-mini"
+
+actions:
+  fetch:
+    target: "mcp://internal_kb"
+    kind: "mcp:tool"
+    tool_name: "fetch"
+  relay:
+    target: "a2a://external_peer"
+    kind: "a2a:send_message"
+
+trigger t:
+  kind: "a2a"
+  target: "brokers://chain-egress/a2a"
+  on_message: -> transition to @executor.collect
+
+executor collect:
+  do: ->
+    run @actions.fetch
+      set @variables.payload = @outputs.result
+  on_exit: -> transition to @executor.send
+
+executor send:
+  do: ->
+    run @actions.relay
+      with message = @variables.payload
+  on_exit: -> transition to @echo.done
+
+echo done:
+  kind: "a2a:status_update_event"
+  state: "TASK_STATE_COMPLETED"
+  message: "ok"
+`;
+    const result = parseAndLintSource(source);
+    const warnings = chainDiagnostics(result.diagnostics);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].message).toContain('@actions.fetch');
+    expect(warnings[0].message).toContain('@actions.relay');
+  });
+
+  it('does not flag same-connection tool reuse', () => {
+    const source = `
+config:
+  agent_name: "chain-same-conn"
+
+llm:
+  g:
+    target: "llm://openai"
+    kind: "OpenAI"
+    model: "gpt-4o-mini"
+
+actions:
+  fetch:
+    target: "mcp://internal_kb"
+    kind: "mcp:tool"
+    tool_name: "fetch"
+  store:
+    target: "mcp://internal_kb"
+    kind: "mcp:tool"
+    tool_name: "store"
+
+trigger t:
+  kind: "a2a"
+  target: "brokers://chain-same-conn/a2a"
+  on_message: -> transition to @executor.collect
+
+executor collect:
+  do: ->
+    run @actions.fetch
+      set @variables.payload = @outputs.result
+  on_exit: -> transition to @executor.send
+
+executor send:
+  do: ->
+    run @actions.store
+      with message = @variables.payload
+  on_exit: -> transition to @echo.done
+
+echo done:
+  kind: "a2a:status_update_event"
+  state: "TASK_STATE_COMPLETED"
+  message: "ok"
+`;
+    const result = parseAndLintSource(source);
+    expect(chainDiagnostics(result.diagnostics)).toHaveLength(0);
+  });
+
+  it('follows artifact handoffs across agentic nodes via .output refs', () => {
+    const source = `
+config:
+  agent_name: "chain-handoff"
+
+llm:
+  g:
+    target: "llm://openai"
+    kind: "OpenAI"
+    model: "gpt-4o-mini"
+
+actions:
+  fetch:
+    target: "mcp://internal_kb"
+    kind: "mcp:tool"
+    tool_name: "fetch"
+  relay:
+    target: "a2a://external_peer"
+    kind: "a2a:send_message"
+
+trigger t:
+  kind: "a2a"
+  target: "brokers://chain-handoff/a2a"
+  on_message: -> transition to @executor.collect
+
+executor collect:
+  do: ->
+    run @actions.fetch
+      set @variables.payload = @outputs.result
+  on_exit: -> transition to @subagent.reviewer
+
+subagent reviewer:
+  llm: @llm.g
+  reasoning:
+    instructions: -> review the artifact
+    actions:
+      relay: @actions.relay
+        with message = @executor.collect.output
+  on_exit: -> transition to @echo.done
+
+echo done:
+  kind: "a2a:status_update_event"
+  state: "TASK_STATE_COMPLETED"
+  message: "ok"
+`;
+    const result = parseAndLintSource(source);
+    const warnings = chainDiagnostics(result.diagnostics);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].message).toContain('@subagent.reviewer');
+  });
+});
+
 describe('unknown-block rules', () => {
   it('reports error for unknown top-level block', () => {
     const source = `
